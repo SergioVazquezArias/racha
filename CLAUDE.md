@@ -70,8 +70,8 @@ Aplican a todo el código. Son la sección 3 de `docs/arquitectura.md`.
 | Fase | Contenido | Estado |
 |---|---|---|
 | 00 | Instalación de herramientas | Hecha |
-| 01 | Documento en el repo + `CLAUDE.md` + primer commit | En curso |
-| 02 | Esqueleto Vite/React/TS + tipos + repositorio + datos de ejemplo | |
+| 01 | Documento en el repo + `CLAUDE.md` + primer commit | Hecha |
+| 02 | Esqueleto Vite/React/TS + tipos + repositorio + datos de ejemplo | Hecha |
 | 03 | `src/logica/rachas.ts` con pruebas de Vitest | |
 | 04 | Pantalla Hoy + registro de recaídas | |
 | 05 | Modo discreto | |

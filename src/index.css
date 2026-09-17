@@ -1,0 +1,8 @@
+@import 'tailwindcss';
+
+/* Estilos base de la app. La paleta y el tema claro/oscuro llegan en la fase 04,
+   junto con la pantalla Hoy. */
+html {
+  /* Evita que iOS agrande el texto al girar el teléfono. */
+  -webkit-text-size-adjust: 100%;
+}
