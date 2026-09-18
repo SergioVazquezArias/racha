@@ -88,4 +88,94 @@ Aplican a todo el código. Son la sección 3 de `docs/arquitectura.md`.
 | 07 | Metas, mediciones y gráficas | Hecha |
 | 08 | PWA, GitHub Pages, instalación en el iPhone y carga diferida de las gráficas | Hecha |
 | 09 | Respaldo, borrado total, tema oscuro y cierre de la v1 | Hecha |
-| 10 | README y portafolio | |
+| 10 | README y portafolio | Hecha |
+
+**La v1 está cerrada y etiquetada como `v1.0`.** De aquí en adelante no hay plan
+de fases: lo que venga son cambios sueltos.
+
+---
+
+## Notas para retomar el proyecto
+
+Escritas al cerrar la v1, para quien vuelva dentro de seis meses —Sergio, o una
+sesión nueva— sin acordarse de nada.
+
+### Cómo volver a empezar
+
+1. Lee este archivo y luego `docs/arquitectura.md`, que es la especificación
+   completa. Todo lo que parece arbitrario está explicado ahí.
+2. `npm install` y `npm test`. Si las 389 pruebas pasan, el proyecto está sano.
+3. `npm run dev` abre la app en <http://localhost:5173/racha/>. El `/racha/` del
+   final hace falta.
+4. Cada push a `main` corre las pruebas y publica en GitHub Pages. Si una prueba
+   falla no se publica nada. **No hay otro paso de despliegue.**
+
+La app real vive en el iPhone de Sergio y sus datos también: no hay servidor, no
+hay copia, y el entorno de desarrollo nunca ve datos reales. Los ocho hábitos y
+las dos metas que aparecen al abrir en el navegador son relleno.
+
+### Decisiones que no hay que revertir sin pensarlo mucho
+
+Cada una de estas parece simplificable, y cada una se tomó por una razón que no
+es evidente desde el código:
+
+- **Los hábitos positivos y negativos son dos componentes separados.** Unificarlos
+  con una bandera es la primera refactorización que se le ocurre a cualquiera y
+  produce un componente con dos modos que nadie entiende. La asimetría es
+  conceptual, no cosmética (sección 5).
+- **El ámbar y la regla de las dos ámbar consecutivas.** Sin el ámbar, un hábito
+  semanal se juzga como binario y la app miente. Sin la regla de las dos, el
+  ámbar vuelve al sistema complaciente y la racha deja de significar algo.
+- **Los veredictos semanales se calculan una vez y se guardan** (regla 8).
+  Recalcular el pasado con los números de hoy reescribiría la historia cada vez
+  que se edita un objetivo.
+- **Las fechas son `"YYYY-MM-DD"` en hora local, nunca UTC ni timestamps**
+  (regla 2). Las pruebas corren en `America/Mexico_City` justamente para que un
+  descuido con UTC se delate.
+- **`mostrarNombre` recibe el interruptor como segundo parámetro opcional que
+  vale «apagado» por omisión**, y el interruptor no se persiste. Las dos cosas
+  son la red de seguridad del modo discreto: un descuido esconde nombres, nunca
+  los enseña (sección 8).
+- **El respaldo tiene tres botones y no uno.** La descarga falla en silencio
+  dentro de la PWA instalada en iOS. Quitar los otros dos caminos porque «uno
+  basta» reintroduce un fallo invisible en lo único que protege los datos. La
+  hoja de compartir está **probada en el iPhone de Sergio**, no solo investigada.
+- **Al borrar todo, los hábitos nacen con `creadoEn` de hoy.** Si conservaran su
+  fecha original, la app cerraría once semanas pasadas en rojo al abrirse. Lo
+  vigila `src/datos/ejemplo/documento.test.ts`; si esa prueba estorba, el
+  problema es el cambio, no la prueba.
+- **Recharts se carga aparte**, no en el arranque. La pantalla Hoy —que es el
+  99 % del uso— no necesita la librería de gráficas.
+- **La `base` de Vite es `/racha/`.** Sin eso la app publicada abre en blanco.
+
+### Qué quedó fuera a propósito
+
+No son pendientes. Son decisiones:
+
+- **Notificaciones push**: exigirían un servidor y rompen el costo cero y el «los
+  datos no salen del teléfono». Se sustituyen con un Atajo de iOS.
+- **Sincronización y copia en la nube**: mismo motivo. El respaldo manual es la
+  red de seguridad, y el recordatorio de los 30 días existe por eso.
+- **Cuentas y multiusuario**: no es un producto.
+- **Cifrado**: el modo discreto es discreción, no seguridad, y presentarlo de
+  otro modo sería peor que no tenerlo.
+- **Gamificación**: ni insignias, ni niveles, ni puntos.
+- **Pruebas de interfaz**: se prueba la lógica y nada más. En una app de este
+  tamaño las pruebas de interfaz cuestan más de lo que valen, y lo que de verdad
+  puede salir mal es lógica pura.
+- **Un enrutador**: son cuatro pantallas dentro de una app instalada. La pestaña
+  activa vive en memoria y cada arranque abre en Hoy, que es lo que se quiere ver.
+
+### Dónde morder con cuidado
+
+- `src/logica/rachas.ts` — **nunca se toca sin correr `npm test` después**
+  (regla 10). Es el archivo del que dependen todas las pantallas.
+- `src/logica/cierre.ts` — decide qué semanas se cierran al arrancar la app. Un
+  error aquí inventa historia o la borra.
+- `src/datos/repositorio/documento.ts` — el único archivo que toca
+  `localStorage`. Si algo tiene que escribir datos, pasa por aquí.
+- `src/logica/validarRespaldo.ts` — el único lugar por donde entran datos de
+  fuera. Todo lo demás lo escribió la app.
+- La línea `@custom-variant dark (...)` de `src/index.css` es lo que hace que el
+  selector de tema mande sobre el ajuste del iPhone. Si desaparece, los cientos
+  de `dark:` de la app vuelven a obedecer solo al sistema, en silencio.

@@ -608,9 +608,13 @@ la primera semana calificada es la del lunes siguiente. Lo vigila
 | 07 | Metas, mediciones y gráficas. **Hecha.** |
 | 08 | PWA, GitHub Pages, instalación en el iPhone y carga diferida de Recharts. **Hecha.** |
 | 09 | Respaldo, borrado total, tema y cierre de la v1. **Hecha.** |
-| 10 | README y portafolio |
+| 10 | README y portafolio. **Hecha.** |
 
 Una fase por sesión. Cada fase cierra con un commit.
+
+**La v1 está cerrada y etiquetada como `v1.0`** (18 de septiembre de 2026). Las
+notas para retomar el proyecto —qué no revertir y qué quedó fuera a propósito—
+están al final de `CLAUDE.md`.
 
 ---
 
