@@ -80,7 +80,7 @@ Todo se guarda como un único documento JSON en `localStorage`, bajo la llave
   id: string
   nombre: string            // el real; solo lo ve el usuario
   alias: string | null      // lo que se muestra si privado === true
-  icono: string             // emoji, o "●" si privado
+  icono: string             // emoji; los privados también llevan el suyo
   privado: boolean
   tipo: "positivo" | "negativo"
   cadencia: "diaria" | "semanal"
@@ -287,14 +287,24 @@ sobre el 30 de agosto sale del cupo de septiembre.
 Algunos hábitos son privados. El usuario no quiere que se lean si alguien toma
 su teléfono.
 
-- Un hábito con `privado: true` muestra su `alias` y un **punto de color en
-  lugar de emoji** (un emoji delata más que el texto).
+- Un hábito con `privado: true` muestra su `alias` en lugar del nombre real.
+  **Nada más cambia.**
+- **Un hábito privado lleva un emoji normal, elegido por el usuario y acorde a
+  su alias, igual que cualquier otro hábito.** No lleva punto gris ni ninguna
+  otra marca. Un punto entre emojis de colores delataría que hay algo
+  escondido, que es justo lo contrario de lo que se busca: lo que se quiere es
+  que un hábito privado sea indistinguible de los demás.
 - Existe una sola función `mostrarNombre(habito)` que decide qué texto se ve.
   **Todas** las pantallas la usan.
 - En Ajustes hay un interruptor **"Mostrar nombres reales"** que vive en
   memoria y **no se persiste**: cada arranque de la app empieza apagado.
+- `mostrarNombre(habito, mostrarReales)` recibe ese interruptor como segundo
+  dato **opcional, que vale «apagado» si no se pasa**. Un descuido muestra el
+  alias, nunca el nombre real.
 - En Estadísticas, los hallazgos de hábitos privados se muestran siempre con el
-  alias, aunque el interruptor esté prendido en otra pantalla.
+  alias, aunque el interruptor esté prendido en otra pantalla. No hace falta
+  recordarlo: Estadísticas llama a `mostrarNombre(habito)` a secas y el
+  interruptor no le llega.
 - Al exportar el respaldo, **advertir en pantalla** que el archivo contiene los
   nombres reales.
 
@@ -462,7 +472,7 @@ Interacción diaria real: **tres toques**. Los cinco negativos no piden nada.
 | 02 | Esqueleto Vite/React/TS + tipos + repositorio + datos de ejemplo. **Hecha.** |
 | 03 | `src/logica/rachas.ts` con pruebas de Vitest. **Hecha.** |
 | 04 | Pantalla Hoy + registro de recaídas. **Hecha.** |
-| 05 | Modo discreto |
+| 05 | Modo discreto. **Hecha.** |
 | 06 | Hábitos, CRUD completo y Estadísticas |
 | 07 | Metas, mediciones y gráficas |
 | 08 | PWA, GitHub Pages e instalación en el iPhone |

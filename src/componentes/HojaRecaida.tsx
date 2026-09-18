@@ -21,6 +21,7 @@ import { useState } from 'react'
 
 import { horaActual } from '../logica/fechas'
 import { mostrarNombre } from '../logica/nombres'
+import { useDiscrecion } from '../pantallas/discrecion'
 import type { Habito, Hora } from '../tipos'
 
 interface Props {
@@ -30,6 +31,7 @@ interface Props {
 }
 
 export default function HojaRecaida({ habito, alCerrar, alGuardar }: Props) {
+  const { mostrarNombresReales } = useDiscrecion()
   const [hora, setHora] = useState<Hora>(horaActual)
   const [contexto, setContexto] = useState<string | null>(null)
   const [nota, setNota] = useState('')
@@ -53,7 +55,7 @@ export default function HojaRecaida({ habito, alCerrar, alGuardar }: Props) {
       <section
         role="dialog"
         aria-modal="true"
-        aria-label={`Registrar recaída de ${mostrarNombre(habito)}`}
+        aria-label={`Registrar recaída de ${mostrarNombre(habito, mostrarNombresReales)}`}
         className="hoja-que-sube borde-inferior-seguro relative max-h-[88vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white px-5 pt-4 dark:bg-neutral-900"
       >
         <header className="flex items-center justify-between">
@@ -69,7 +71,7 @@ export default function HojaRecaida({ habito, alCerrar, alGuardar }: Props) {
         </header>
 
         <h2 className="mt-3 text-xl font-semibold text-neutral-900 dark:text-neutral-100">
-          {mostrarNombre(habito)}
+          {mostrarNombre(habito, mostrarNombresReales)}
         </h2>
 
         <label className="mt-4 flex items-center justify-between rounded-2xl bg-neutral-100 px-4 py-3 dark:bg-neutral-800">

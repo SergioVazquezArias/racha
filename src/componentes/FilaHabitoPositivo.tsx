@@ -14,6 +14,7 @@ import { eliminarRegistro, guardarRegistro } from '../datos/repositorio'
 import { estaMarcado, idDeRegistro } from '../logica/dia'
 import { claveSemana } from '../logica/fechas'
 import { mostrarIcono, mostrarNombre } from '../logica/nombres'
+import { useDiscrecion } from '../pantallas/discrecion'
 import { rachaDe } from '../logica/rachas'
 import { hechosDeSemana } from '../logica/semaforo'
 import { textoDeRacha, textoDeSemana } from '../logica/textos'
@@ -29,6 +30,7 @@ interface Props {
 }
 
 export default function FilaHabitoPositivo({ habito, datos, hoy, alCambiar }: Props) {
+  const { mostrarNombresReales } = useDiscrecion()
   const idDeHoy = idDeRegistro(habito.id, hoy)
   const marcado = estaMarcado(habito.id, datos.registros, hoy)
 
@@ -73,7 +75,7 @@ export default function FilaHabitoPositivo({ habito, datos, hoy, alCambiar }: Pr
               : 'text-neutral-900 dark:text-neutral-100'
           }`}
         >
-          {mostrarNombre(habito)}
+          {mostrarNombre(habito, mostrarNombresReales)}
         </p>
         <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">{detalle(habito, datos, hoy)}</p>
       </div>
@@ -82,7 +84,7 @@ export default function FilaHabitoPositivo({ habito, datos, hoy, alCambiar }: Pr
         type="button"
         onClick={alternar}
         aria-pressed={marcado}
-        aria-label={`${marcado ? 'Desmarcar' : 'Marcar'} ${mostrarNombre(habito)}`}
+        aria-label={`${marcado ? 'Desmarcar' : 'Marcar'} ${mostrarNombre(habito, mostrarNombresReales)}`}
         className={`flex size-13 shrink-0 items-center justify-center rounded-full border-2 transition-colors active:scale-95 ${
           marcado
             ? 'border-emerald-600 bg-emerald-600 text-white'

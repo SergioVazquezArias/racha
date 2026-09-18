@@ -4,9 +4,13 @@
  * Son datos de relleno para que la app no nazca vacía. El usuario los edita,
  * archiva o borra desde la propia app.
  *
- * Los dos hábitos privados llevan alias genéricos a propósito: el repositorio
- * es público y ningún dato personal puede vivir en el código. El nombre real y
- * los contextos de esos dos los escribe el usuario dentro de la app.
+ * Los dos hábitos privados llevan alias y emojis genéricos a propósito: el
+ * repositorio es público y ningún dato personal puede vivir en el código. El
+ * nombre real, el emoji y los contextos de esos dos los escribe el usuario
+ * dentro de la app.
+ *
+ * Nótese que sí traen emoji, y uno cualquiera: un hábito privado se ve idéntico
+ * a los demás (sección 8). Una marca especial delataría que hay algo escondido.
  */
 
 import { hoy, sumarDias } from '../../logica/fechas'
@@ -34,8 +38,8 @@ export function habitosDeEjemplo(): Habito[] {
     negativo('sin-pantallas', 'Sin pantallas', '📱', CONTEXTOS_COMUNES, false, 4, creadoEn),
     negativo('sin-refresco', 'Sin refresco', '🥤', CONTEXTOS_COMUNES, false, 5, creadoEn),
     negativo('sin-postre', 'Sin postre', '🍰', CONTEXTOS_COMUNES, false, 6, creadoEn),
-    negativo('privado-1', 'Hábito privado 1', '●', CONTEXTOS_DE_RELLENO, true, 7, creadoEn),
-    negativo('privado-2', 'Hábito privado 2', '●', CONTEXTOS_DE_RELLENO, true, 8, creadoEn),
+    negativo('privado-1', 'Hábito privado 1', '🌙', CONTEXTOS_DE_RELLENO, true, 7, creadoEn),
+    negativo('privado-2', 'Hábito privado 2', '🌱', CONTEXTOS_DE_RELLENO, true, 8, creadoEn),
   ]
 }
 

@@ -14,7 +14,7 @@ export interface Habito {
   nombre: string
   /** Lo que se muestra si `privado === true`. */
   alias: string | null
-  /** Emoji, o `"●"` si es privado: un emoji delata más que el texto. */
+  /** Emoji. Los privados también llevan el suyo: una marca los delataría. */
   icono: string
   privado: boolean
   tipo: TipoHabito

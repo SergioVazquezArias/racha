@@ -23,6 +23,7 @@ import { useState } from 'react'
 import { guardarRegistro } from '../datos/repositorio'
 import { idDeRegistro, recaidaDelDia } from '../logica/dia'
 import { mostrarIcono, mostrarNombre } from '../logica/nombres'
+import { useDiscrecion } from '../pantallas/discrecion'
 import { rachaDe } from '../logica/rachas'
 import { pluralizar, textoDeNegativo } from '../logica/textos'
 import HojaRecaida from './HojaRecaida'
@@ -38,6 +39,7 @@ interface Props {
 }
 
 export default function FilaHabitoNegativo({ habito, datos, hoy, alCambiar }: Props) {
+  const { mostrarNombresReales } = useDiscrecion()
   const [hojaAbierta, setHojaAbierta] = useState(false)
   const { actual, mejor } = rachaDe(habito, datos, hoy)
   const recaidaDeHoy = recaidaDelDia(habito.id, datos.registros, hoy)
@@ -71,7 +73,7 @@ export default function FilaHabitoNegativo({ habito, datos, hoy, alCambiar }: Pr
       </span>
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm text-neutral-700 dark:text-neutral-200">{mostrarNombre(habito)}</p>
+        <p className="truncate text-sm text-neutral-700 dark:text-neutral-200">{mostrarNombre(habito, mostrarNombresReales)}</p>
         <p className="truncate text-xs text-neutral-400 dark:text-neutral-500">
           {textoDeNegativo(actual, mejor, recaidaDeHoy)}
         </p>

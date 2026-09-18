@@ -12,17 +12,21 @@
  * (sección 12).
  */
 
+import { useState } from 'react'
+
 import FilaHabitoNegativo from '../componentes/FilaHabitoNegativo'
 import FilaHabitoPositivo from '../componentes/FilaHabitoPositivo'
 import ResumenSemana from '../componentes/ResumenSemana'
 import { estaMarcado } from '../logica/dia'
 import { fechaEnPalabras, hoy as hoyMismo } from '../logica/fechas'
+import Ajustes from './Ajustes'
 import { useDatos } from './useDatos'
 import type { DatosDeHoy } from './useDatos'
 import type { Fecha, Habito } from '../tipos'
 
 export default function Hoy() {
   const { datos, recargar } = useDatos()
+  const [ajustesAbiertos, setAjustesAbiertos] = useState(false)
   const hoy = hoyMismo()
 
   const positivos = datos.habitos.filter((habito) => habito.tipo === 'positivo')
@@ -32,10 +36,23 @@ export default function Hoy() {
 
   return (
     <div className="mx-auto max-w-md px-4 pb-28">
-      <header className="borde-superior-seguro pb-4">
-        <h1 className="text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">Hoy</h1>
-        <p className="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">{fechaEnPalabras(hoy)}</p>
+      <header className="borde-superior-seguro flex items-start justify-between pb-4">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">Hoy</h1>
+          <p className="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">{fechaEnPalabras(hoy)}</p>
+        </div>
+        {/* El engrane abre Ajustes, que tapa la pantalla hasta que se toca «Listo». */}
+        <button
+          type="button"
+          onClick={() => setAjustesAbiertos(true)}
+          aria-label="Abrir ajustes"
+          className="-mt-1 -mr-2 rounded-xl p-2 text-xl opacity-60"
+        >
+          <span aria-hidden="true">⚙️</span>
+        </button>
       </header>
+
+      {ajustesAbiertos && <Ajustes alCerrar={() => setAjustesAbiertos(false)} />}
 
       <Seccion titulo="Por hacer" cuenta={pendientes.length}>
         {pendientes.length === 0 ? (

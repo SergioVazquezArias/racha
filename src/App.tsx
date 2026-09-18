@@ -10,6 +10,7 @@
 import { useState } from 'react'
 
 import BarraPestanas from './componentes/BarraPestanas'
+import ProveedorDiscrecion from './pantallas/ProveedorDiscrecion'
 import Hoy from './pantallas/Hoy'
 import Pendiente from './pantallas/Pendiente'
 import type { Pestana } from './pantallas/pestanas'
@@ -17,11 +18,14 @@ import type { Pestana } from './pantallas/pestanas'
 export default function App() {
   const [pestana, setPestana] = useState<Pestana>('hoy')
 
+  // El interruptor de nombres reales envuelve toda la app porque quien lo
+  // necesita son las filas de hábito, tres niveles abajo de Hoy. Vive en
+  // memoria: cada arranque nace apagado (sección 8).
   return (
-    <>
+    <ProveedorDiscrecion>
       <main className="min-h-dvh">{pantallaDe(pestana)}</main>
       <BarraPestanas activa={pestana} alCambiar={setPestana} />
-    </>
+    </ProveedorDiscrecion>
   )
 }
 
