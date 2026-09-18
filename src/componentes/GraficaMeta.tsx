@@ -28,11 +28,11 @@ import {
 } from 'recharts'
 
 import { bandasVisibles, usaBandasDeIngles } from '../logica/ingles'
-import { diaYMesCorto, diasEntre, sumarDias } from '../logica/fechas'
+import { MarcaDeFecha, PuntoDeMedicion } from './PiezasDeGrafica'
+import { ladoDelHito } from '../logica/rotulos'
+import { diasEntre } from '../logica/fechas'
 import { ejeDeLaMeta, ejeDeTiempo, serieDe } from '../logica/serieMeta'
 import { useColoresDeGrafica } from '../pantallas/tema'
-import type { ColoresDeGrafica } from '../pantallas/tema'
-import type { EjeDeTiempo, PuntoDeSerie } from '../logica/serieMeta'
 import type { Medicion, Meta } from '../tipos'
 
 export default function GraficaMeta({ meta, mediciones }: { meta: Meta; mediciones: Medicion[] }) {
@@ -65,8 +65,7 @@ export default function GraficaMeta({ meta, mediciones }: { meta: Meta; medicion
             scale="linear"
             domain={[tiempo.minimo, tiempo.maximo]}
             ticks={tiempo.marcas}
-            tickFormatter={(dia: number) => diaYMesCorto(sumarDias(meta.fechaInicio, dia))}
-            tick={{ fill: colores.texto, fontSize: 11 }}
+            tick={<MarcaDeFecha inicio={meta.fechaInicio} tiempo={tiempo} color={colores.texto} />}
             tickLine={false}
             axisLine={{ stroke: colores.reja }}
             interval={0}
@@ -99,7 +98,7 @@ export default function GraficaMeta({ meta, mediciones }: { meta: Meta; medicion
             strokeWidth={2}
             connectNulls
             isAnimationActive={false}
-            dot={(propiedades: PropiedadesDePunto) => <Punto {...propiedades} colores={colores} />}
+            dot={(propiedades) => <PuntoDeMedicion {...propiedades} colores={colores} />}
           />
 
           {meta.hitos.map((hito) => (
@@ -123,55 +122,4 @@ export default function GraficaMeta({ meta, mediciones }: { meta: Meta; medicion
       </ResponsiveContainer>
     </div>
   )
-}
-
-/** Lo que Recharts le pasa a cada punto de la línea. */
-interface PropiedadesDePunto {
-  cx?: number
-  cy?: number
-  index?: number
-  payload?: PuntoDeSerie
-}
-
-/**
- * Un punto de la curva real.
- *
- * Los de mañana van rellenos y los de noche **huecos**: relleno del color del
- * fondo y borde del color de la línea (sección 11). Es la misma señal que el
- * texto de abajo explica, para que nadie tenga que adivinar por qué un punto se
- * ve distinto.
- */
-function Punto({ cx, cy, payload, colores }: PropiedadesDePunto & { colores: ColoresDeGrafica }) {
-  if (cx === undefined || cy === undefined || payload === undefined || payload.real === null) {
-    return <g />
-  }
-
-  return (
-    <circle
-      cx={cx}
-      cy={cy}
-      r={4}
-      fill={payload.noche ? colores.fondo : colores.real}
-      stroke={colores.real}
-      strokeWidth={2}
-    />
-  )
-}
-
-/**
- * De qué lado del marcador se escribe el nombre del hito.
- *
- * Encima, salvo cuando el hito cae pegado a un borde: ahí el nombre se saldría
- * de la gráfica y quedaría cortado. Pegado a la derecha se escribe a la
- * izquierda del punto, y al revés. El hito de peso cae al 90 % del camino, así
- * que este caso no es raro: es el que hay.
- */
-function ladoDelHito(dia: number, tiempo: EjeDeTiempo): 'top' | 'left' | 'right' {
-  const ancho = tiempo.maximo - tiempo.minimo
-  if (ancho <= 0) return 'top'
-
-  const avance = (dia - tiempo.minimo) / ancho
-  if (avance > 0.75) return 'left'
-  if (avance < 0.25) return 'right'
-  return 'top'
 }
