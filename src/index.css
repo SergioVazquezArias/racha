@@ -8,10 +8,23 @@
  * gesto de inicio.
  */
 
+/**
+ * Quién manda en el tema oscuro (fase 09).
+ *
+ * De fábrica, Tailwind le haría caso solo al teléfono, y entonces el selector
+ * de Ajustes no serviría de nada. Con esta línea el oscuro lo decide la palabra
+ * que la app escribe en `data-tema`, que sale de lo elegido en Ajustes: claro,
+ * oscuro o lo mismo que el sistema.
+ *
+ * Es el único renglón que hizo falta cambiar: los `dark:` repartidos por las
+ * cuatro pantallas siguen escritos exactamente igual.
+ */
+@custom-variant dark (&:where([data-tema='oscuro'], [data-tema='oscuro'] *));
+
 html {
   /* iOS agranda el texto al girar el teléfono si no se le dice que no. */
   -webkit-text-size-adjust: 100%;
-  /* La app sigue el tema del sistema; `ajustes.tema` nace en "sistema". */
+  /* Antes de que arranque la app, el tema del teléfono; después, el elegido. */
   color-scheme: light dark;
   background-color: #f5f5f4;
 }
@@ -20,6 +33,24 @@ html {
   html {
     background-color: #0c0a09;
   }
+}
+
+/**
+ * El fondo de la página, ya con el tema elegido. Va después del bloque de
+ * arriba a propósito: lo que diga Ajustes manda sobre lo que diga el teléfono.
+ *
+ * Esto pinta el fondo de todo lo que queda fuera de la app —lo que se ve al
+ * jalar la pantalla, y la franja de la isla dinámica— y le dice a iOS de qué
+ * color dibujar los campos de texto y la barra de desplazamiento.
+ */
+html[data-tema='claro'] {
+  color-scheme: light;
+  background-color: #f5f5f4;
+}
+
+html[data-tema='oscuro'] {
+  color-scheme: dark;
+  background-color: #0c0a09;
 }
 
 body {

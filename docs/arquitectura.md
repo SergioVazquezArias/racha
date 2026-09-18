@@ -1,7 +1,7 @@
 # Racha — Arquitectura
 
 App personal de hábitos y metas. Documento de referencia del proyecto.
-Versión 5 · 18 de septiembre de 2026 · Sergio Vázquez
+Versión 6 · 18 de septiembre de 2026 · Sergio Vázquez
 
 ---
 
@@ -508,18 +508,76 @@ Interacción diaria real: **tres toques**. Los cinco negativos no piden nada.
    vinculados, proyección en texto y grasa estimada.
 4. **Estadísticas** — ranking de cumplimiento a 30 días, mejor racha global,
    patrón por día de la semana y patrones de recaída.
-5. **Ajustes** — interruptor de nombres reales, exportar e importar respaldo,
-   alta de hábitos y metas, tema, estatura, recordatorio de medición.
+5. **Ajustes** — tema, interruptor de nombres reales, estatura, respaldo y
+   borrar todo. En ese orden: de lo inofensivo a lo irreversible.
+
+### El tema (fase 09)
+
+Tres opciones —claro, oscuro y **sistema**, que es la de fábrica— guardadas en
+`ajustes.tema`. Mandan por encima del iPhone: elegir claro deja la app en claro
+aunque el teléfono se ponga en oscuro al anochecer.
+
+Lo decide `src/logica/tema.ts`, que es una función pura con sus pruebas, y lo
+pinta `ProveedorTema` escribiendo `data-tema` en la etiqueta de más afuera del
+documento. De ahí cuelga todo: `index.css` redefine la variante `dark` de
+Tailwind para que lea ese atributo en lugar del ajuste del sistema, así que los
+`dark:` repartidos por las cuatro pantallas siguen escritos igual y no hubo que
+tocar ni un componente. El tema se aplica en `main.tsx` antes de dibujar, para
+que no haya un destello blanco al abrir.
 
 ---
 
 ## 14. Respaldo
 
-- **Exportar**: descarga un JSON con todo, nombrado
-  `racha-respaldo-YYYY-MM-DD.json`. Advertir que contiene nombres reales.
-- **Importar**: valida `version` antes de sobrescribir y pide confirmación
-  explícita.
-- Guardar `ultimoRespaldo` y avisar en Ajustes si pasaron más de 30 días.
+### Exportar — por qué son tres botones y no uno
+
+**Dentro de la app instalada en la pantalla de inicio, la descarga normal no es
+confiable en el iPhone.** En Safari funciona; instalada, unas veces deja la app
+atorada en una pantalla de descarga sin salida y otras no hace absolutamente
+nada, sin un solo mensaje de error. Falla en silencio, que para un respaldo es
+lo peor que puede pasar: creerías que lo tienes y no tendrías nada.
+
+Por eso la pantalla ofrece **los tres caminos, siempre los tres**, y nunca
+esconde los otros dos:
+
+1. **Compartir** — la hoja de compartir de iOS, que sí funciona dentro de la app
+   instalada y lleva a «Guardar en Archivos». Es el camino bueno en el teléfono.
+2. **Descargar** — lo normal en la computadora.
+3. **Copiar el texto** — no depende de nada del sistema, solo de la pantalla. Es
+   el que no puede fallar, y el texto arranca tapado porque ahí se leen los
+   nombres reales (sección 8).
+
+El archivo se llama `racha-respaldo-YYYY-MM-DD.json` con la fecha local (regla
+2) y lleva el documento completo dentro de un sobre con `app`, `version` y
+`creadoEn`. Antes de los botones, siempre a la vista, el aviso de que el
+respaldo contiene los nombres reales de los hábitos privados sin cifrar.
+
+### Importar
+
+Dos entradas, las parejas de los dos caminos de salida: elegir el archivo o
+pegar el texto. Se revisa **antes de tocar nada** —que sea JSON legible, que
+traiga `version` y que esté completo— y si algo falla no se escribe nada y se
+dice en español qué falló. Si pasa, se enseña qué trae el archivo y se pide
+escribir `REEMPLAZAR`, dejando claro que se pierde todo lo de hoy.
+
+La revisión vive en `src/logica/validarRespaldo.ts` y es el único lugar de la
+app por donde entran datos de fuera.
+
+### El recordatorio
+
+`ajustes.ultimoRespaldo` guarda el día del último respaldo, y pasados 30 días
+hay aviso en Ajustes más un punto ámbar en el engrane de Hoy: a Ajustes se entra
+una vez al mes, así que un aviso que solo viva ahí dentro no avisa de nada.
+
+Solo **compartir** apunta la fecha solo, porque iOS confirma si el archivo se
+guardó o si se canceló. Descargar y copiar preguntan «¿ya lo guardaste?»: un
+aviso que se apaga sin que haya respaldo no sirve de nada.
+
+### Borrar todo
+
+Botón al final de Ajustes, apartado del resto. Pide escribir `BORRAR` y deja el
+teléfono **como recién instalado**, con los hábitos y las metas de ejemplo, para
+no tener que escribir ocho hábitos desde la nada para volver a empezar.
 
 ---
 
@@ -536,7 +594,7 @@ Interacción diaria real: **tres toques**. Los cinco negativos no piden nada.
 | 06 | Hábitos, CRUD completo y Estadísticas. **Hecha.** |
 | 07 | Metas, mediciones y gráficas. **Hecha.** |
 | 08 | PWA, GitHub Pages, instalación en el iPhone y carga diferida de Recharts. **Hecha.** |
-| 09 | Respaldo y cierre de la v1 |
+| 09 | Respaldo, borrado total, tema y cierre de la v1. **Hecha.** |
 | 10 | README y portafolio |
 
 Una fase por sesión. Cada fase cierra con un commit.
@@ -552,5 +610,8 @@ Una fase por sesión. Cada fase cierra con un commit.
 - **Safari borra almacenamiento de sitios sin usar en 7 días**, pero las apps
   de pantalla de inicio llevan su propio contador que se reinicia con cada uso.
   Uso diario, riesgo nulo. El respaldo cubre el resto.
+- **La descarga de archivos no es confiable dentro de la app instalada en iOS**,
+  y falla sin avisar. Por eso el respaldo tiene tres caminos y no uno; el
+  detalle está en la sección 14.
 - **La red corporativa del usuario bloquea `api.anthropic.com`.** El desarrollo
   se hace con hotspot o desde casa.

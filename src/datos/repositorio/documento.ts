@@ -65,9 +65,34 @@ export function inicializar(): DocumentoRacha {
   return documento
 }
 
-/** Borra todo. Se usará al importar un respaldo y al empezar de cero. */
+/** Borra todo. Lo usan la importación de un respaldo y el empezar de cero. */
 export function borrarTodo(): void {
   localStorage.removeItem(LLAVE)
+}
+
+/**
+ * Escribe un respaldo ya revisado encima de todo lo que había (sección 14).
+ *
+ * Quien comprueba que el respaldo sea legible, de esta versión y que esté
+ * completo es `src/logica/validarRespaldo.ts`, antes de llegar aquí. Este
+ * archivo solo escribe: cuando se le llama, la decisión ya se tomó y lo de
+ * antes se pierde.
+ */
+export function importarDocumento(documento: DocumentoRacha): void {
+  guardarDocumento(documento)
+}
+
+/**
+ * Borrar todo y empezar de cero (sección 14).
+ *
+ * Deja el teléfono **como recién instalado**: no un hueco vacío, sino lo mismo
+ * que vería alguien que abre Racha por primera vez, con los hábitos y las metas
+ * de ejemplo. Así no hay que escribir ocho hábitos desde la nada para volver a
+ * empezar: se editan los que ya están.
+ */
+export function empezarDeCero(): DocumentoRacha {
+  borrarTodo()
+  return inicializar()
 }
 
 /** Lee, deja que la función cambie el documento y lo vuelve a guardar. */

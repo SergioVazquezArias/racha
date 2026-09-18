@@ -7,7 +7,15 @@
  * como uno solo.
  */
 
-export { borrarTodo, guardarDocumento, hayDatos, inicializar, leerDocumento } from './documento'
+export {
+  borrarTodo,
+  empezarDeCero,
+  guardarDocumento,
+  hayDatos,
+  importarDocumento,
+  inicializar,
+  leerDocumento,
+} from './documento'
 export {
   eliminarHabito,
   eliminarRegistro,
@@ -29,6 +37,7 @@ export {
   guardarAjustes,
   guardarMedicion,
   guardarMeta,
+  marcarRespaldo,
   obtenerAjustes,
   obtenerMediciones,
   obtenerMedicionesDe,

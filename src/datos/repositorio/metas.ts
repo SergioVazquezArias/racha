@@ -3,7 +3,7 @@
  */
 
 import { colocar, leerDocumento, modificar } from './documento'
-import type { Ajustes, Medicion, Meta } from '../../tipos'
+import type { Ajustes, Fecha, Medicion, Meta } from '../../tipos'
 
 export function obtenerMetas(): Meta[] {
   return leerDocumento().metas
@@ -47,5 +47,19 @@ export function obtenerAjustes(): Ajustes {
 export function guardarAjustes(ajustes: Ajustes): void {
   modificar((documento) => {
     documento.ajustes = ajustes
+  })
+}
+
+/**
+ * Apunta el día en que se hizo el último respaldo (sección 14).
+ *
+ * Solo se escribe cuando el respaldo **salió de verdad**: al compartirlo y que
+ * iOS confirme que se guardó, al descargarlo o al copiarlo. Si se abre la hoja
+ * de compartir y se cancela, aquí no se toca nada, porque el aviso de los 30
+ * días sirve de poco si se apaga con una intención.
+ */
+export function marcarRespaldo(fecha: Fecha): void {
+  modificar((documento) => {
+    documento.ajustes = { ...documento.ajustes, ultimoRespaldo: fecha }
   })
 }

@@ -17,8 +17,10 @@ import { useState } from 'react'
 import FilaHabitoNegativo from '../componentes/FilaHabitoNegativo'
 import FilaHabitoPositivo from '../componentes/FilaHabitoPositivo'
 import ResumenSemana from '../componentes/ResumenSemana'
+import { obtenerAjustes } from '../datos/repositorio'
 import { estaMarcado } from '../logica/dia'
 import { fechaEnPalabras, hoy as hoyMismo } from '../logica/fechas'
+import { tocaAvisar } from '../logica/respaldo'
 import Ajustes from './Ajustes'
 import { useDatos } from './useDatos'
 import type { DatosDeHoy } from './useDatos'
@@ -28,6 +30,21 @@ export default function Hoy() {
   const { datos, recargar } = useDatos()
   const [ajustesAbiertos, setAjustesAbiertos] = useState(false)
   const hoy = hoyMismo()
+
+  // El punto del engrane: hace más de 30 días que no hay respaldo (sección 14).
+  // A Ajustes se entra una vez al mes, así que el aviso no se enteraría de nada
+  // si solo viviera ahí dentro. Es un punto y nada más: no dice de qué es,
+  // porque esta pantalla se ve de reojo (sección 8).
+  //
+  // Se vuelve a mirar al cerrar Ajustes, que es lo único que puede cambiarlo, y
+  // no en cada toque de un hábito: leer los datos completos para pintar un
+  // punto de ocho píxeles sería caro para lo que se usa esta pantalla.
+  const [faltaRespaldo, setFaltaRespaldo] = useState(() => faltaElRespaldo(hoy))
+
+  function cerrarAjustes() {
+    setAjustesAbiertos(false)
+    setFaltaRespaldo(faltaElRespaldo(hoy))
+  }
 
   const positivos = datos.habitos.filter((habito) => habito.tipo === 'positivo')
   const negativos = datos.habitos.filter((habito) => habito.tipo === 'negativo')
@@ -45,14 +62,20 @@ export default function Hoy() {
         <button
           type="button"
           onClick={() => setAjustesAbiertos(true)}
-          aria-label="Abrir ajustes"
-          className="-mt-1 -mr-2 rounded-xl p-2 text-xl opacity-60"
+          aria-label={faltaRespaldo ? 'Abrir ajustes: falta hacer un respaldo' : 'Abrir ajustes'}
+          className="relative -mt-1 -mr-2 rounded-xl p-2 text-xl opacity-60"
         >
           <span aria-hidden="true">⚙️</span>
+          {faltaRespaldo && (
+            <span
+              aria-hidden="true"
+              className="absolute top-1 right-1 h-2 w-2 rounded-full bg-amber-500"
+            />
+          )}
         </button>
       </header>
 
-      {ajustesAbiertos && <Ajustes alCerrar={() => setAjustesAbiertos(false)} />}
+      {ajustesAbiertos && <Ajustes alCerrar={cerrarAjustes} />}
 
       <Seccion titulo="Por hacer" cuenta={pendientes.length}>
         {pendientes.length === 0 ? (
@@ -132,4 +155,9 @@ function Lista({
       ))}
     </ul>
   )
+}
+
+/** ¿Hace más de 30 días que no se respalda? Lo que enciende el punto del engrane. */
+function faltaElRespaldo(hoy: Fecha): boolean {
+  return tocaAvisar(obtenerAjustes().ultimoRespaldo, hoy)
 }
