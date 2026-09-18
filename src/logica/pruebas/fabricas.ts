@@ -120,6 +120,7 @@ export function metaDePeso(cambios: Partial<Meta> = {}): Meta {
     hitos: [{ nombre: 'Mitad del camino', fecha: '2027-03-24', valor: 75.7 }],
     habitosVinculados: ['gym'],
     frecuencia: 'semanal',
+    diaDeMedicion: 6,
     estado: 'activa',
     cerradaEn: null,
     ...cambios,
@@ -141,6 +142,7 @@ export function metaDeIngles(cambios: Partial<Meta> = {}): Meta {
     hitos: [{ nombre: 'B1 confirmado', fecha: '2027-03-15', valor: 58 }],
     habitosVinculados: ['ingles'],
     frecuencia: 'mensual',
+    diaDeMedicion: null,
     ...cambios,
   })
 }

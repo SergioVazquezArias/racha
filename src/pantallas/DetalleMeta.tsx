@@ -24,7 +24,7 @@ import { cerrada } from '../logica/metasAltas'
 import { eliminarMedicion, eliminarMeta, guardarMedicion, guardarMeta } from '../datos/repositorio'
 import { habitosDe, medicionesDe } from './useDatosMetas'
 import { progresoDe } from '../logica/metas'
-import { textoDeCierre, valorConUnidad } from '../logica/textosMetas'
+import { textoDeCadencia, textoDeCierre, valorConUnidad } from '../logica/textosMetas'
 import type { DatosDeMetas } from './useDatosMetas'
 import type { Fecha, Medicion, Meta } from '../tipos'
 
@@ -127,6 +127,7 @@ export default function DetalleMeta({ meta, datos, hoy, alCerrar, alEditar, alCa
           <ListaDeMediciones
             meta={meta}
             mediciones={mediciones}
+            cadencia={textoDeCadencia(meta)}
             alTocar={(medicion) => setHoja({ cual: 'medicion', medicion })}
           />
         </div>

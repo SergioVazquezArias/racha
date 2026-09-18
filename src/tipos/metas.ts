@@ -19,6 +19,15 @@ export interface Meta {
   hitos: HitoMeta[]
   habitosVinculados: string[]
   frecuencia: FrecuenciaMeta
+  /**
+   * Qué día toca medirse, o `null` si no hay día fijo.
+   *
+   * En una meta **semanal** es el día de la semana, de 0 el lunes a 6 el
+   * domingo, igual que en el resto de la app. En una meta **mensual** es el día
+   * del mes, del 1 al 28: no se pasa de 28 para que ningún mes se quede sin ese
+   * día, que es lo que le pasa al 30 en febrero.
+   */
+  diaDeMedicion: number | null
   estado: EstadoMeta
   cerradaEn: Fecha | null
 }

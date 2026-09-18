@@ -9,7 +9,7 @@
  * va en contra se dice que va en contra, sin reproche y sin caritas.
  */
 
-import { diaYMesEnPalabras, fechaLargaEnPalabras } from './fechas'
+import { DIAS_DE_LA_SEMANA, diaYMesEnPalabras, fechaLargaEnPalabras } from './fechas'
 import { AJUSTE_NOCTURNO_KG } from './tendencia'
 import { pluralizar } from './textos'
 import type { ProgresoDeMeta } from './metas'
@@ -98,4 +98,23 @@ export function textoDeCierre(meta: Meta): string | null {
 /** La grasa corporal, siempre presentada como estimación (sección 11). */
 export function textoDeGrasa(porcentaje: number): string {
   return `${numero(porcentaje)} % estimado`
+}
+
+/**
+ * Cada cuánto y qué día se mide una meta: `"Semanal, los domingos"`.
+ *
+ * Sin día fijo se dice solo la cadencia. En plural solo se le pone ese al
+ * sábado y al domingo: se dice «los lunes», no «los luneses».
+ */
+export function textoDeCadencia(meta: Meta): string {
+  const cadencia = meta.frecuencia === 'semanal' ? 'Semanal' : 'Mensual'
+  const dia = meta.diaDeMedicion
+  if (dia === null) return cadencia
+
+  if (meta.frecuencia === 'mensual') return `${cadencia}, el día ${dia}`
+
+  const nombre = DIAS_DE_LA_SEMANA[dia]
+  if (nombre === undefined) return cadencia
+
+  return `${cadencia}, los ${dia >= 5 ? `${nombre}s` : nombre}`
 }

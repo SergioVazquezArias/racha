@@ -18,13 +18,16 @@ interface Props {
   meta: Meta
   /** Ya ordenadas de la más reciente a la más vieja. */
   mediciones: Medicion[]
+  /** Cada cuánto toca medirse, ya redactado: «Semanal, los domingos». */
+  cadencia: string
   alTocar: (medicion: Medicion) => void
 }
 
-export default function ListaDeMediciones({ meta, mediciones, alTocar }: Props) {
+export default function ListaDeMediciones({ meta, mediciones, cadencia, alTocar }: Props) {
   return (
     <section className="rounded-2xl border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
       <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100">Mediciones</h2>
+      <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">{cadencia}</p>
 
       {mediciones.length === 0 && (
         <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">

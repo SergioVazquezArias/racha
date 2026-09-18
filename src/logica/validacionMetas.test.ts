@@ -24,6 +24,7 @@ function campos(cambios: Partial<CamposDeMeta> = {}): CamposDeMeta {
     hitos: [],
     habitosVinculados: [],
     frecuencia: 'semanal',
+    diaDeMedicion: 6,
     ...cambios,
   }
 }
@@ -91,6 +92,28 @@ describe('lo que se revisa antes de guardar una meta', () => {
     const dentro = campos({ hitos: [{ nombre: 'Mitad del camino', fecha: '2027-03-24', valor: 75.7 }] })
 
     expect(problemasDeMeta(dentro)).toEqual([])
+  })
+
+  it('acepta un día de la semana y también ninguno', () => {
+    expect(problemasDeMeta(campos({ frecuencia: 'semanal', diaDeMedicion: 6 }))).toEqual([])
+    expect(problemasDeMeta(campos({ frecuencia: 'semanal', diaDeMedicion: 0 }))).toEqual([])
+    expect(problemasDeMeta(campos({ diaDeMedicion: null }))).toEqual([])
+  })
+
+  it('no deja un día de la semana que no existe', () => {
+    expect(problemasDeMeta(campos({ frecuencia: 'semanal', diaDeMedicion: 7 }))).toContain(
+      'El día de medición tiene que ser un día de la semana.',
+    )
+  })
+
+  it('en una meta mensual el día del mes va del 1 al 28', () => {
+    expect(problemasDeMeta(campos({ frecuencia: 'mensual', diaDeMedicion: 28 }))).toEqual([])
+    expect(problemasDeMeta(campos({ frecuencia: 'mensual', diaDeMedicion: 31 }))).toContain(
+      'El día del mes va del 1 al 28.',
+    )
+    expect(problemasDeMeta(campos({ frecuencia: 'mensual', diaDeMedicion: 0 }))).toContain(
+      'El día del mes va del 1 al 28.',
+    )
   })
 
   it('una meta sin hitos y sin hábitos vinculados se guarda sin problema', () => {

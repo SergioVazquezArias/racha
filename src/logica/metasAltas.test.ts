@@ -35,6 +35,7 @@ function campos(cambios: Partial<CamposDeMeta> = {}): CamposDeMeta {
     hitos: [],
     habitosVinculados: [],
     frecuencia: 'semanal',
+    diaDeMedicion: 6,
     ...cambios,
   }
 }

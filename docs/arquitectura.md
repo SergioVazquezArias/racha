@@ -179,6 +179,9 @@ de `Semana` se queda solo para pintar el escudo en el historial.
   hitos: { nombre: string, fecha: string, valor: number }[]
   habitosVinculados: string[]
   frecuencia: "semanal" | "mensual"
+  // Qué día toca medirse, o null si no hay día fijo. En una meta semanal,
+  // de 0 el lunes a 6 el domingo. En una mensual, el día del mes, del 1 al 28.
+  diaDeMedicion: number | null
   estado: "activa" | "cumplida" | "abandonada"
   cerradaEn: string | null
 }
@@ -508,7 +511,7 @@ Interacción diaria real: **tres toques**. Los cinco negativos no piden nada.
 | 05 | Modo discreto. **Hecha.** |
 | 06 | Hábitos, CRUD completo y Estadísticas. **Hecha.** |
 | 07 | Metas, mediciones y gráficas. **Hecha.** |
-| 08 | PWA, GitHub Pages e instalación en el iPhone |
+| 08 | PWA, GitHub Pages e instalación en el iPhone. Incluye cargar Recharts solo al abrir una meta: la app se abre a diario para tres toques y no debe cargar la librería de gráficas para eso |
 | 09 | Respaldo y cierre de la v1 |
 | 10 | README y portafolio |
 

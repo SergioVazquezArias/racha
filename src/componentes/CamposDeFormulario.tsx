@@ -72,15 +72,22 @@ export function CampoTexto({
   )
 }
 
-/** Un número chico, de 1 a 7. Abre el teclado numérico del teléfono. */
+/**
+ * Un número chico y entero. Abre el teclado numérico del teléfono.
+ *
+ * Por omisión llega hasta 7, que son las veces por semana de un hábito. El día
+ * del mes de una meta usa el mismo campo con el tope en 28.
+ */
 export function CampoNumero({
   etiqueta,
   valor,
   alCambiar,
+  maximo = 7,
 }: {
   etiqueta: string
   valor: number | null
   alCambiar: (valor: number | null) => void
+  maximo?: number
 }) {
   return (
     <label className="block flex-1">
@@ -89,7 +96,7 @@ export function CampoNumero({
         type="number"
         inputMode="numeric"
         min={1}
-        max={7}
+        max={maximo}
         value={valor ?? ''}
         onChange={(evento) => alCambiar(evento.target.value === '' ? null : Number(evento.target.value))}
         className="mt-1 min-h-12 w-full rounded-2xl border border-neutral-200 bg-white px-3 text-base tabular-nums text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"

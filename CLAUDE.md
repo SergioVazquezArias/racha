@@ -86,6 +86,6 @@ Aplican a todo el código. Son la sección 3 de `docs/arquitectura.md`.
 | 05 | Modo discreto | Hecha |
 | 06 | Hábitos, CRUD completo y Estadísticas | Hecha |
 | 07 | Metas, mediciones y gráficas | Hecha |
-| 08 | PWA, GitHub Pages e instalación en el iPhone | |
+| 08 | PWA, GitHub Pages, instalación en el iPhone y carga diferida de las gráficas | |
 | 09 | Respaldo y cierre de la v1 | |
 | 10 | README y portafolio | |

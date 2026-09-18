@@ -134,6 +134,7 @@ function camposIniciales(meta: Meta | null, hoy: Fecha): CamposDeMeta {
     hitos: [],
     habitosVinculados: [],
     frecuencia: 'semanal',
+    diaDeMedicion: null,
   }
 }
 

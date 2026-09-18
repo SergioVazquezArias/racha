@@ -6,6 +6,7 @@
  * antes de los campos que se miden, los hitos y los hábitos que la sostienen.
  */
 
+import SelectorDiaDeMedicion from './SelectorDiaDeMedicion'
 import { CampoDecimal, CampoFecha } from './CamposDeMedida'
 import { CampoTexto, Segmentado } from './CamposDeFormulario'
 import type { CamposDeMeta } from '../logica/metasAltas'
@@ -76,7 +77,15 @@ export default function CamposBasicosDeMeta({ campos, alCambiar }: Props) {
           { valor: 'mensual', texto: 'Mensual' },
         ]}
         valor={campos.frecuencia}
-        alElegir={(frecuencia) => alCambiar({ frecuencia })}
+        // Al cambiar de cadencia el día se borra: un 6 que quería decir domingo
+        // pasaría a querer decir «el día 6 del mes», que no es lo que se eligió.
+        alElegir={(frecuencia) => alCambiar({ frecuencia, diaDeMedicion: null })}
+      />
+
+      <SelectorDiaDeMedicion
+        frecuencia={campos.frecuencia}
+        dia={campos.diaDeMedicion}
+        alCambiar={(diaDeMedicion) => alCambiar({ diaDeMedicion })}
       />
     </>
   )

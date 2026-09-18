@@ -41,6 +41,8 @@ export function metasIniciales(habitos: Habito[]): Meta[] {
       hitos: [{ nombre: 'Mitad del camino', fecha: '2026-12-29', valor: 76 }],
       habitosVinculados: ['gym', 'sin-refresco', 'sin-postre'].filter(existe),
       frecuencia: 'semanal',
+      // Domingo. La semana de la app empieza en lunes, así que el domingo es el 6.
+      diaDeMedicion: 6,
       estado: 'activa',
       cerradaEn: null,
     },
@@ -58,6 +60,8 @@ export function metasIniciales(habitos: Habito[]): Meta[] {
       hitos: [{ nombre: 'B1 confirmado', fecha: '2027-03-15', valor: 58 }],
       habitosVinculados: ['ingles'].filter(existe),
       frecuencia: 'mensual',
+      // Sin día fijo: el examen cae cuando cae.
+      diaDeMedicion: null,
       estado: 'activa',
       cerradaEn: null,
     },

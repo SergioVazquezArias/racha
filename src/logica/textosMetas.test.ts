@@ -9,6 +9,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  textoDeCadencia,
   textoDeCierre,
   textoDeGrasa,
   textoDeProgreso,
@@ -18,7 +19,7 @@ import {
   valorConUnidad,
 } from './textosMetas'
 import { progresoDe } from './metas'
-import { medicion, metaDePeso } from './pruebas/fabricas'
+import { medicion, metaDeIngles, metaDePeso } from './pruebas/fabricas'
 import type { Proyeccion } from './tendencia'
 
 const META = metaDePeso()
@@ -156,5 +157,31 @@ describe('los textos sueltos', () => {
 
     expect(textoDeCierre(cumplida)).toBe('Cumplida el 14 de abril de 2027')
     expect(textoDeCierre(abandonada)).toBe('Abandonada el 30 de noviembre de 2026')
+  })
+})
+
+describe('cada cuánto se mide una meta', () => {
+  it('dice el día de la semana, en plural donde toca', () => {
+    expect(textoDeCadencia(metaDePeso({ diaDeMedicion: 6 }))).toBe('Semanal, los domingos')
+    expect(textoDeCadencia(metaDePeso({ diaDeMedicion: 5 }))).toBe('Semanal, los sábados')
+  })
+
+  it('los días que no llevan ese en plural se quedan igual', () => {
+    expect(textoDeCadencia(metaDePeso({ diaDeMedicion: 0 }))).toBe('Semanal, los lunes')
+    expect(textoDeCadencia(metaDePeso({ diaDeMedicion: 1 }))).toBe('Semanal, los martes')
+    expect(textoDeCadencia(metaDePeso({ diaDeMedicion: 2 }))).toBe('Semanal, los miércoles')
+  })
+
+  it('en una meta mensual dice el día del mes', () => {
+    expect(textoDeCadencia(metaDeIngles({ diaDeMedicion: 1 }))).toBe('Mensual, el día 1')
+  })
+
+  it('sin día fijo dice solo cada cuánto', () => {
+    expect(textoDeCadencia(metaDePeso({ diaDeMedicion: null }))).toBe('Semanal')
+    expect(textoDeCadencia(metaDeIngles({ diaDeMedicion: null }))).toBe('Mensual')
+  })
+
+  it('la meta de peso real se mide los domingos', () => {
+    expect(textoDeCadencia(metaDePeso())).toBe('Semanal, los domingos')
   })
 })

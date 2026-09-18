@@ -23,6 +23,7 @@ export function problemasDeMeta(campos: CamposDeMeta): string[] {
   problemas.push(...problemasDeLosCampos(campos))
   problemas.push(...problemasDeLasFechas(campos))
   problemas.push(...problemasDeLosValores(campos))
+  problemas.push(...problemasDelDiaDeMedicion(campos))
   problemas.push(...problemasDeLosHitos(campos))
 
   return problemas
@@ -68,6 +69,26 @@ function problemasDeLosValores(campos: CamposDeMeta): string[] {
   }
 
   return []
+}
+
+/**
+ * El día en que toca medirse.
+ *
+ * Significa cosas distintas según la cadencia: en una meta semanal es un día de
+ * la semana y en una mensual es un día del mes. Sin día fijo también es válido:
+ * un examen de inglés cae cuando cae.
+ */
+function problemasDelDiaDeMedicion(campos: CamposDeMeta): string[] {
+  const dia = campos.diaDeMedicion
+  if (dia === null) return []
+  if (!Number.isInteger(dia)) return ['El día de medición tiene que ser un día entero.']
+
+  if (campos.frecuencia === 'semanal') {
+    return dia >= 0 && dia <= 6 ? [] : ['El día de medición tiene que ser un día de la semana.']
+  }
+
+  // Hasta 28 nada más: al 30 le falta febrero y al 31 le faltan cuatro meses.
+  return dia >= 1 && dia <= 28 ? [] : ['El día del mes va del 1 al 28.']
 }
 
 /** Un hito fuera del camino no se podría dibujar sobre la gráfica. */

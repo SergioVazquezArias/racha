@@ -36,6 +36,7 @@ export interface CamposDeMeta {
   hitos: HitoMeta[]
   habitosVinculados: string[]
   frecuencia: FrecuenciaMeta
+  diaDeMedicion: number | null
 }
 
 /** Una meta nueva. Nace activa y sin fecha de cierre. */
@@ -119,6 +120,7 @@ function soloLosCampos(campos: CamposDeMeta) {
     hitos: [...campos.hitos].sort((uno, otro) => uno.fecha.localeCompare(otro.fecha)),
     habitosVinculados: campos.habitosVinculados,
     frecuencia: campos.frecuencia,
+    diaDeMedicion: campos.diaDeMedicion,
   }
 }
 
