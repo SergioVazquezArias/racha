@@ -16,7 +16,8 @@
  * 3. **No inventa fallas de días en que el hábito no existía** (sección 9). Si
  *    un hábito nació un miércoles, su primera semana quedó a medias y no se
  *    juzga; se empieza a contar desde el lunes siguiente. Lo mismo por el otro
- *    lado: un hábito archivado no sigue acumulando semanas rojas.
+ *    lado: un hábito archivado no sigue acumulando semanas rojas, y uno que
+ *    volvió no recibe de golpe el veredicto de los meses que estuvo guardado.
  *
  * Es lógica pura: no lee el reloj ni toca `localStorage`. El día de hoy llega
  * como parámetro para que las pruebas puedan fingir cualquier fecha.
@@ -24,6 +25,7 @@
 
 import { evaluarSemana } from './semaforo'
 import { claveSemana, lunesDeLaSemana, sumarDias } from './fechas'
+import { inicioDeConteo } from './vida'
 import type { Fecha, Habito, Registro, Semana } from '../tipos'
 
 /**
@@ -59,7 +61,7 @@ export function semanasPorCerrar(
  * por completo, de la más vieja a la más nueva.
  */
 function lunesesPorJuzgar(habito: Habito, hoy: Fecha): Fecha[] {
-  const primero = primerLunesCompleto(habito.creadoEn)
+  const primero = primerLunesCompleto(inicioDeConteo(habito))
   const ultimo = ultimoLunesJuzgable(habito, hoy)
 
   const luneses: Fecha[] = []
@@ -73,9 +75,9 @@ function lunesesPorJuzgar(habito: Habito, hoy: Fecha): Fecha[] {
  * Si nació en lunes, ese mismo. Si nació a media semana, el lunes siguiente:
  * esa primera semana a medias no se juzga nunca.
  */
-function primerLunesCompleto(creadoEn: Fecha): Fecha {
-  const lunes = lunesDeLaSemana(creadoEn)
-  return lunes === creadoEn ? lunes : sumarDias(lunes, 7)
+function primerLunesCompleto(inicio: Fecha): Fecha {
+  const lunes = lunesDeLaSemana(inicio)
+  return lunes === inicio ? lunes : sumarDias(lunes, 7)
 }
 
 /**

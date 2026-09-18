@@ -14,28 +14,30 @@
 
 import { useCallback, useState } from 'react'
 
-import {
-  obtenerComodines,
-  obtenerHabitosActivos,
-  obtenerRegistros,
-  obtenerSemanas,
-} from '../datos/repositorio'
+import { obtenerComodines, obtenerHabitos, obtenerRegistros, obtenerSemanas } from '../datos/repositorio'
 import type { DatosDeRacha } from '../logica/rachas'
 import type { Habito } from '../tipos'
 
 /**
- * Los hábitos activos más todo lo que hace falta para calcular sus rachas.
+ * Los hábitos más todo lo que hace falta para calcular sus rachas.
  *
  * Extiende `DatosDeRacha` a propósito: así este mismo objeto se le pasa tal cual
  * a `rachaDe()` y ninguna pantalla tiene que armar la bolsa a mano.
+ *
+ * Los archivados vienen aparte y no mezclados: la pantalla Hoy no los enseña
+ * nunca, y la de Hábitos los enseña abajo, en su propio bloque (sección 9).
  */
 export interface DatosDeHoy extends DatosDeRacha {
   habitos: Habito[]
+  archivados: Habito[]
 }
 
 function leerDatos(): DatosDeHoy {
+  const todos = obtenerHabitos()
+
   return {
-    habitos: obtenerHabitosActivos(),
+    habitos: todos.filter((habito) => habito.archivadoEn === null),
+    archivados: todos.filter((habito) => habito.archivadoEn !== null),
     registros: obtenerRegistros(),
     semanas: obtenerSemanas(),
     comodines: obtenerComodines(),

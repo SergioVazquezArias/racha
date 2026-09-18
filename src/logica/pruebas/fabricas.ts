@@ -27,6 +27,8 @@ export function habitoDiario(creadoEn: Fecha, cambios: Partial<Habito> = {}): Ha
     orden: 1,
     creadoEn,
     archivadoEn: null,
+    revividoEn: null,
+    mejorRachaPrevia: null,
     ...cambios,
   }
 }

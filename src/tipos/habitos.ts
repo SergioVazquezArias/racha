@@ -30,6 +30,20 @@ export interface Habito {
   orden: number
   creadoEn: Fecha
   archivadoEn: Fecha | null
+  /**
+   * El día en que se revivió un hábito archivado. Desde aquí vuelve a contar,
+   * y la racha actual arranca en cero (sección 9).
+   */
+  revividoEn: Fecha | null
+  /**
+   * La mejor racha que llevaba al archivarse, congelada.
+   *
+   * Sin este número la mejor racha se perdería al revivir —porque el conteo
+   * arranca de cero— o se inflaría, contando como limpios los meses que el
+   * hábito estuvo guardado. La mejor racha histórica nunca se pierde, ni al
+   * archivar (sección 6).
+   */
+  mejorRachaPrevia: number | null
 }
 
 /** Positivo se marca al cumplirlo; negativo solo se toca al recaer (sección 5). */

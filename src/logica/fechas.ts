@@ -57,6 +57,33 @@ export function diasDeLaSemana(fecha: Fecha): Fecha[] {
   return [0, 1, 2, 3, 4, 5, 6].map((desplazamiento) => sumarDias(lunes, desplazamiento))
 }
 
+/** Los siete días de la semana, en orden y en español. La semana empieza en lunes. */
+export const DIAS_DE_LA_SEMANA = [
+  'lunes',
+  'martes',
+  'miércoles',
+  'jueves',
+  'viernes',
+  'sábado',
+  'domingo',
+]
+
+/**
+ * Qué día de la semana cae una fecha: 0 el lunes, 6 el domingo.
+ *
+ * El `getDay()` de JavaScript pone el domingo en 0; este lo corre para que la
+ * semana empiece en lunes, como dice Ajustes y como se ven todas las semanas
+ * de la app.
+ */
+export function diaDeLaSemana(fecha: Fecha): number {
+  return (deFecha(fecha).getDay() + 6) % 7
+}
+
+/** Una fecha corta para los ejes de las gráficas: `"15 sept"`. */
+export function diaYMesCorto(fecha: Fecha): string {
+  return format(deFecha(fecha), 'd MMM', { locale: es })
+}
+
 /** Cuántos días hay entre dos fechas. Positivo si la segunda es posterior. */
 export function diasEntre(desde: Fecha, hasta: Fecha): number {
   const milisegundosPorDia = 24 * 60 * 60 * 1000

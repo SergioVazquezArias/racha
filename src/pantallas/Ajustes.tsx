@@ -11,6 +11,7 @@
  * medición y el respaldo.
  */
 
+import { Interruptor } from '../componentes/CamposDeFormulario'
 import { useDiscrecion } from './discrecion'
 
 export default function Ajustes({ alCerrar }: { alCerrar: () => void }) {
@@ -52,37 +53,3 @@ export default function Ajustes({ alCerrar }: { alCerrar: () => void }) {
   )
 }
 
-/** Un interruptor del tamaño de un pulgar. Toda la fila es el botón. */
-function Interruptor({
-  titulo,
-  prendido,
-  alTocar,
-}: {
-  titulo: string
-  prendido: boolean
-  alTocar: () => void
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={prendido}
-      onClick={alTocar}
-      className="flex min-h-14 w-full items-center justify-between rounded-2xl bg-white px-4 py-3 text-left dark:bg-neutral-900"
-    >
-      <span className="text-base text-neutral-900 dark:text-neutral-100">{titulo}</span>
-      <span
-        aria-hidden="true"
-        className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${
-          prendido ? 'bg-neutral-900 dark:bg-neutral-100' : 'bg-neutral-300 dark:bg-neutral-700'
-        }`}
-      >
-        <span
-          className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform dark:bg-neutral-900 ${
-            prendido ? 'translate-x-[1.375rem]' : 'translate-x-0.5'
-          }`}
-        />
-      </span>
-    </button>
-  )
-}

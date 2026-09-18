@@ -25,8 +25,16 @@ export function pluralizar(cantidad: number, singular: string, plural: string): 
  */
 export function textoDeRacha(habito: Habito, actual: number): string {
   if (actual === 0) return 'sin racha todavía'
-  const unidad = habito.cadencia === 'semanal' ? pluralizar(actual, 'semana', 'semanas') : pluralizar(actual, 'día', 'días')
-  return `racha de ${unidad}`
+  return `racha de ${actual} ${unidadDeRacha(habito, actual)}`
+}
+
+/**
+ * La unidad en que se cuenta la racha de un hábito, sin el número: `"días"`,
+ * `"semanas"`. La manda la cadencia (sección 6).
+ */
+export function unidadDeRacha(habito: Habito, cantidad: number): string {
+  if (habito.cadencia === 'semanal') return cantidad === 1 ? 'semana' : 'semanas'
+  return cantidad === 1 ? 'día' : 'días'
 }
 
 /** El progreso de la semana en curso de un hábito semanal: `"3 de 5 esta semana"`. */

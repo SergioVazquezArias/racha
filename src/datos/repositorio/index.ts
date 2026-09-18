@@ -9,7 +9,6 @@
 
 export { borrarTodo, guardarDocumento, hayDatos, inicializar, leerDocumento } from './documento'
 export {
-  archivarHabito,
   eliminarHabito,
   eliminarRegistro,
   guardarComodin,

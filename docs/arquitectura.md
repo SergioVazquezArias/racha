@@ -1,7 +1,7 @@
 # Racha — Arquitectura
 
 App personal de hábitos y metas. Documento de referencia del proyecto.
-Versión 4 · 17 de septiembre de 2026 · Sergio Vázquez
+Versión 5 · 18 de septiembre de 2026 · Sergio Vázquez
 
 ---
 
@@ -91,10 +91,24 @@ Todo se guarda como un único documento JSON en `localStorage`, bajo la llave
   orden: number
   creadoEn: string          // "YYYY-MM-DD"
   archivadoEn: string | null
+  revividoEn: string | null      // desde cuándo vuelve a contar
+  mejorRachaPrevia: number | null // el récord congelado al archivar
 }
 ```
 
 Un hábito **nunca se borra por accidente**: se archiva. Ver sección 9.
+
+`revividoEn` y `mejorRachaPrevia` existen para que archivar y revivir cumplan
+lo que promete la sección 9 sin mentir en ningún número. Al revivir, la racha
+actual arranca de cero: eso lo hace `revividoEn`, que mueve el inicio del
+conteo. Y la mejor racha histórica no se pierde: eso lo hace
+`mejorRachaPrevia`, que se escribe **al archivar**, con la mejor del momento.
+
+Con solo la primera, un hábito negativo archivado seis meses volvería
+presumiendo un récord de doscientos días limpios que nadie vivió: los meses
+guardados no tienen recaídas registradas y se verían limpios. Con solo la
+segunda, la racha actual seguiría corriendo como si nunca se hubiera ido. Hacen
+falta las dos.
 
 ### Registro
 
@@ -260,6 +274,20 @@ semanas cuestan la racha.
 - **% de cumplimiento a 30 días** — el número honesto. Una semana ámbar salva
   la racha pero baja el porcentaje.
 
+En el detalle de un hábito el cumplimiento se enseña en tres ventanas —7 días,
+30 días y todo—, siempre juntas, y cada clase de hábito se mide como se vive:
+
+| Clase | Cuenta |
+|---|---|
+| Diario | días cumplidos ÷ días contados |
+| Semanal | marcas hechas ÷ marcas propuestas, repartiendo el objetivo por día |
+| Negativo | días limpios ÷ días contados |
+
+**Días contados** son los que el hábito vivió de verdad: desde su alta —o desde
+su vuelta, si se archivó y revivió— hasta ayer, sin los días que pasó
+archivado. Un hábito de nueve días de vida se mide sobre nueve, no sobre treinta
+con veintiún fallas inventadas.
+
 ### El día de hoy
 
 El día en curso no cuenta ni a favor ni en contra hasta la medianoche. Se
@@ -321,10 +349,15 @@ Sale de la pantalla Hoy. **Conserva todo**: registros, semanas, mejor racha.
 Se puede revivir; al revivirlo la racha actual arranca en cero pero la **mejor
 racha histórica se conserva**.
 
+Mientras está archivado **no acumula nada**: ni días fallados, ni días limpios,
+ni veredictos de semana. Su historial sigue completo y visible en su detalle.
+
 ### Eliminar (excepcional)
 
 Borra el hábito y todo su historial, sin vuelta atrás. Pide confirmación
-**escribiendo el nombre del hábito**.
+**escribiendo el nombre del hábito**: el que se está viendo en pantalla, que en
+uno privado es el alias mientras el interruptor de nombres reales esté apagado.
+Pedir un nombre escondido obligaría a destaparlo para poder escribirlo.
 
 ### Cuatro reglas que no se pueden improvisar
 
@@ -473,7 +506,7 @@ Interacción diaria real: **tres toques**. Los cinco negativos no piden nada.
 | 03 | `src/logica/rachas.ts` con pruebas de Vitest. **Hecha.** |
 | 04 | Pantalla Hoy + registro de recaídas. **Hecha.** |
 | 05 | Modo discreto. **Hecha.** |
-| 06 | Hábitos, CRUD completo y Estadísticas |
+| 06 | Hábitos, CRUD completo y Estadísticas. **Hecha.** |
 | 07 | Metas, mediciones y gráficas |
 | 08 | PWA, GitHub Pages e instalación en el iPhone |
 | 09 | Respaldo y cierre de la v1 |

@@ -68,6 +68,8 @@ function positivo(
     orden,
     creadoEn,
     archivadoEn: null,
+    revividoEn: null,
+    mejorRachaPrevia: null,
   }
 }
 
@@ -98,5 +100,7 @@ function negativo(
     orden,
     creadoEn,
     archivadoEn: null,
+    revividoEn: null,
+    mejorRachaPrevia: null,
   }
 }

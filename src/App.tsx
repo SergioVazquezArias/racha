@@ -11,6 +11,8 @@ import { useState } from 'react'
 
 import BarraPestanas from './componentes/BarraPestanas'
 import ProveedorDiscrecion from './pantallas/ProveedorDiscrecion'
+import Estadisticas from './pantallas/Estadisticas'
+import Habitos from './pantallas/Habitos'
 import Hoy from './pantallas/Hoy'
 import Pendiente from './pantallas/Pendiente'
 import type { Pestana } from './pantallas/pestanas'
@@ -32,15 +34,7 @@ export default function App() {
 function pantallaDe(pestana: Pestana) {
   if (pestana === 'hoy') return <Hoy />
 
-  if (pestana === 'habitos') {
-    return (
-      <Pendiente
-        titulo="Hábitos"
-        fase="fase 06"
-        descripcion="Alta, edición y archivado de hábitos, con el detalle de cada uno y su historial de semanas."
-      />
-    )
-  }
+  if (pestana === 'habitos') return <Habitos />
 
   if (pestana === 'metas') {
     return (
@@ -52,11 +46,5 @@ function pantallaDe(pestana: Pestana) {
     )
   }
 
-  return (
-    <Pendiente
-      titulo="Stats"
-      fase="fase 06"
-      descripcion="Cumplimiento a 30 días, mejor racha y los patrones de recaída por día, por hora y por contexto."
-    />
-  )
+  return <Estadisticas />
 }

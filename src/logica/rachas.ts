@@ -7,20 +7,22 @@
  * - **Semanal** — semanas seguidas cumplidas, según el semáforo.
  * - **Negativa** — días limpios desde la última recaída.
  *
- * Tres cosas valen para las tres:
+ * Cuatro cosas valen para las tres:
  *
  * 1. **Hoy nunca cuenta**, ni a favor ni en contra. El juicio llega a
  *    medianoche. Por eso `hoy` se recibe como parámetro y nunca se lee el reloj
  *    aquí dentro: así las pruebas pueden fingir cualquier día.
- * 2. **Nada mira más atrás de `creadoEn`.** Un hábito nuevo no inventa fallas
- *    de días en que no existía (sección 9).
- * 3. La **mejor racha histórica** se devuelve siempre junto a la actual, y una
- *    caída nunca la borra.
+ * 2. **Nada mira fuera de la vida del hábito.** Ni antes de que existiera, ni
+ *    mientras estuvo archivado. De dónde a dónde cuenta lo decide `vida.ts`.
+ * 3. La **mejor racha histórica** se devuelve siempre junto a la actual, y no
+ *    la borra ni una caída ni un archivado.
+ * 4. Un hábito revivido **arranca de cero** pero conserva su récord (sección 9).
  */
 
 import { comodinCubreDia, comodinCubreSemana } from './comodines'
 import { claveDeSemana } from './semaforo'
-import { diasEntre, sumarDias } from './fechas'
+import { claveSemana, diasEntre, sumarDias } from './fechas'
+import { finDeConteo, inicioDeConteo } from './vida'
 import type { Comodin, Fecha, Habito, Registro, Semana } from '../tipos'
 
 /** Lo que siempre se muestra junto: la racha de ahora y el récord (sección 6). */
@@ -48,12 +50,23 @@ export function rachaDe(habito: Habito, datos: DatosDeRacha, hoy: Fecha): Resume
   return rachaDiaria(habito, datos.registros, hoy, datos.comodines)
 }
 
+/**
+ * La mejor racha, que nunca se pierde.
+ *
+ * Compara la mejor del tramo que se acaba de recorrer contra la que quedó
+ * congelada al archivar. Un hábito que vuelve después de seis meses arranca de
+ * cero, pero su récord sigue ahí (secciones 6 y 9).
+ */
+function conRecord(habito: Habito, actual: number, mejorDeAhora: number): ResumenRacha {
+  return { actual, mejor: Math.max(mejorDeAhora, habito.mejorRachaPrevia ?? 0) }
+}
+
 // ---------------------------------------------------------------------------
 // Cadencia diaria
 // ---------------------------------------------------------------------------
 
 /**
- * Días seguidos cumplidos, desde que se creó el hábito hasta ayer.
+ * Días seguidos cumplidos, desde que empezó a contar el hábito hasta ayer.
  *
  * Un día del pasado sin palomita es una falla: a medianoche se cerró sin
  * cumplir (sección 5). Salvo que lleve comodín, y entonces el día se salta sin
@@ -71,17 +84,17 @@ export function rachaDiaria(
       .map((registro) => registro.fecha),
   )
 
-  const ayer = sumarDias(hoy, -1)
+  const fin = finDeConteo(habito, hoy)
   let actual = 0
   let mejor = 0
 
-  for (let dia = habito.creadoEn; dia <= ayer; dia = sumarDias(dia, 1)) {
+  for (let dia = inicioDeConteo(habito); dia <= fin; dia = sumarDias(dia, 1)) {
     if (cumplidos.has(dia)) actual += 1
     else if (!comodinCubreDia(comodines, habito.id, dia)) actual = 0
     mejor = Math.max(mejor, actual)
   }
 
-  return { actual, mejor }
+  return conRecord(habito, actual, mejor)
 }
 
 // ---------------------------------------------------------------------------
@@ -100,8 +113,11 @@ export function rachaDiaria(
  * una semana cerrada el mes pasado (regla 8).
  */
 export function rachaSemanal(habito: Habito, semanas: Semana[], comodines: Comodin[] = []): ResumenRacha {
+  // Las semanas anteriores a la vuelta de un hábito revivido siguen guardadas y
+  // se ven en su historial, pero no alimentan la racha de ahora (sección 9).
+  const desde = claveSemana(inicioDeConteo(habito))
   const propias = semanas
-    .filter((semana) => semana.habitoId === habito.id && semana.cerrada)
+    .filter((semana) => semana.habitoId === habito.id && semana.cerrada && claveDeSemana(semana) >= desde)
     .sort((una, otra) => claveDeSemana(una).localeCompare(claveDeSemana(otra)))
 
   let actual = 0
@@ -127,7 +143,7 @@ export function rachaSemanal(habito: Habito, semanas: Semana[], comodines: Comod
     mejor = Math.max(mejor, actual)
   }
 
-  return { actual, mejor }
+  return conRecord(habito, actual, mejor)
 }
 
 // ---------------------------------------------------------------------------
@@ -146,21 +162,35 @@ export function rachaSemanal(habito: Habito, semanas: Semana[], comodines: Comod
  * recaída (sección 7).
  */
 export function rachaNegativa(habito: Habito, registros: Registro[], hoy: Fecha): ResumenRacha {
+  const inicio = inicioDeConteo(habito)
+  const fin = finDeConteo(habito, hoy)
+
+  // La recaída de hoy sí entra, aunque hoy no cuente a favor: el contador no
+  // puede decir «12 días limpios» cuando hoy no lo fue. No suma un día, lo
+  // rompe. En un hábito archivado no hay recaídas que mirar después del cierre.
+  const hasta = habito.archivadoEn === null ? hoy : fin
+
   const recaidas = registros
-    .filter((registro) => registro.habitoId === habito.id && registro.estado === 'fallado')
+    .filter(
+      (registro) =>
+        registro.habitoId === habito.id &&
+        registro.estado === 'fallado' &&
+        registro.fecha >= inicio &&
+        registro.fecha <= hasta,
+    )
     .map((registro) => registro.fecha)
     .sort()
 
   const tramos: number[] = []
-  let inicio = habito.creadoEn
+  let arranque = inicio
 
   for (const recaida of recaidas) {
-    tramos.push(Math.max(0, diasEntre(inicio, recaida)))
-    inicio = sumarDias(recaida, 1)
+    tramos.push(Math.max(0, diasEntre(arranque, recaida)))
+    arranque = sumarDias(recaida, 1)
   }
 
-  // El tramo en curso: de `inicio` hasta ayer. Hoy todavía no cuenta.
-  const actual = Math.max(0, diasEntre(inicio, hoy))
+  // El tramo en curso: de `arranque` al último día que cuenta. Hoy no entra.
+  const actual = arranque > fin ? 0 : diasEntre(arranque, fin) + 1
 
-  return { actual, mejor: Math.max(actual, ...tramos, 0) }
+  return conRecord(habito, actual, Math.max(actual, ...tramos, 0))
 }

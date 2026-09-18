@@ -68,7 +68,9 @@ export default function FilaHabitoNegativo({ habito, datos, hoy, alCambiar }: Pr
 
   return (
     <li className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-3 py-2.5 dark:border-neutral-800 dark:bg-neutral-900">
-      <span aria-hidden="true" className={`text-lg ${habito.privado ? 'text-neutral-400' : ''}`}>
+      {/* Sin ninguna marca para los privados: se ven idénticos a los demás, que
+          es justo lo que pide la sección 8. Un emoji apagado los delataría. */}
+      <span aria-hidden="true" className="text-lg">
         {mostrarIcono(habito)}
       </span>
 

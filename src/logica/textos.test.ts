@@ -14,6 +14,7 @@ import {
   textoDeRacha,
   textoDeSemana,
   textoDiasLimpios,
+  unidadDeRacha,
 } from './textos'
 import { habitoDiario, habitoSemanal, recaida } from './pruebas/fabricas'
 
@@ -108,5 +109,17 @@ describe('el renglón chico de un hábito negativo', () => {
     for (const frase of frases) {
       for (const palabra of prohibidas) expect(frase).not.toContain(palabra)
     }
+  })
+})
+
+describe('la unidad de una racha', () => {
+  it('cuenta días en un hábito diario y semanas en uno semanal', () => {
+    const diario = habitoDiario('2026-01-01')
+    const semanal = habitoSemanal('2026-01-01', 5, 4)
+
+    expect(unidadDeRacha(diario, 3)).toBe('días')
+    expect(unidadDeRacha(diario, 1)).toBe('día')
+    expect(unidadDeRacha(semanal, 3)).toBe('semanas')
+    expect(unidadDeRacha(semanal, 1)).toBe('semana')
   })
 })

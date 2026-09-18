@@ -3,7 +3,8 @@
  */
 
 import { colocar, leerDocumento, modificar } from './documento'
-import type { Comodin, Fecha, Habito, Registro, Semana } from '../../tipos'
+import { sinElHabito } from '../../logica/altas'
+import type { Comodin, Habito, Registro, Semana } from '../../tipos'
 
 export function obtenerHabitos(): Habito[] {
   return leerDocumento().habitos.sort((uno, otro) => uno.orden - otro.orden)
@@ -18,21 +19,22 @@ export function guardarHabito(habito: Habito): void {
   modificar((documento) => colocar(documento.habitos, habito))
 }
 
-/** Archivar conserva todo el historial (sección 9). Es lo habitual. */
-export function archivarHabito(habitoId: string, fecha: Fecha): void {
-  modificar((documento) => {
-    const habito = documento.habitos.find((candidato) => candidato.id === habitoId)
-    if (habito !== undefined) habito.archivadoEn = fecha
-  })
-}
-
-/** Eliminar borra el hábito y todo su historial. Sin vuelta atrás. */
+/**
+ * Eliminar borra el hábito y todo su historial. Sin vuelta atrás (sección 9).
+ *
+ * Quién se borra y quién se queda lo decide `sinElHabito`, en la lógica, que es
+ * donde está probado. Aquí solo se guarda el resultado.
+ *
+ * Archivar no tiene función propia: es un cambio del hábito y se guarda con
+ * `guardarHabito`, igual que cualquier otra edición.
+ */
 export function eliminarHabito(habitoId: string): void {
   modificar((documento) => {
-    documento.habitos = documento.habitos.filter((habito) => habito.id !== habitoId)
-    documento.registros = documento.registros.filter((r) => r.habitoId !== habitoId)
-    documento.semanas = documento.semanas.filter((semana) => semana.habitoId !== habitoId)
-    documento.comodines = documento.comodines.filter((c) => c.habitoId !== habitoId)
+    const limpio = sinElHabito(documento, habitoId)
+    documento.habitos = limpio.habitos
+    documento.registros = limpio.registros
+    documento.semanas = limpio.semanas
+    documento.comodines = limpio.comodines
   })
 }
 
