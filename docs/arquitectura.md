@@ -60,6 +60,11 @@ Estas reglas van en `CLAUDE.md` y aplican a todo el código.
 8. **Los veredictos semanales se calculan una vez y se guardan.** No se
    recalcula el pasado.
 9. Cada fase termina en un commit con mensaje legible en español.
+10. **Toda lógica nueva lleva pruebas de Vitest con nombres en español**, para
+    que el usuario pueda leerlas y auditarlas. Y nunca se toca
+    `src/logica/rachas.ts` sin correr `npm test` después.
+11. **Si algo de esta especificación es ambiguo o falta información, se
+    pregunta.** No se inventa ni se asume.
 
 ---
 

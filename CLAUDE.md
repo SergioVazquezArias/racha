@@ -13,6 +13,10 @@ resumen operativo: léelo al empezar cada sesión.
 - **Sergio no programa.** Dirige el proyecto leyendo planes en español y
   aprobando cambios. Explícale siempre qué vas a hacer —en español claro, sin
   jerga— **antes** de hacerlo.
+- **Antes de cualquier cambio grande, propón el plan por escrito en español y
+  espera aprobación.** Sergio no lee código: ese plan es su única forma real de
+  revisar el trabajo antes de que exista. No se empieza a escribir hasta que él
+  diga que sí.
 - **Todo en español**: interfaz, explicaciones, planes, comentarios del código y
   mensajes de commit.
 - **Una fase por sesión.** El plan de las diez fases está en la sección 15 de
@@ -47,6 +51,11 @@ Aplican a todo el código. Son la sección 3 de `docs/arquitectura.md`.
 8. **Los veredictos semanales se calculan una vez y se guardan.** No se recalcula
    el pasado.
 9. Cada fase termina en un commit con mensaje legible en español.
+10. **Toda lógica nueva lleva pruebas de Vitest con nombres en español**, para
+    que Sergio pueda leerlas y auditarlas. Y nunca se toca
+    `src/logica/rachas.ts` sin correr `npm test` después.
+11. **Si algo de la especificación es ambiguo o falta información, se pregunta.**
+    No se inventa ni se asume.
 
 ---
 
