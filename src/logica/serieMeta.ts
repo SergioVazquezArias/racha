@@ -12,12 +12,22 @@
  * cuenta de la tendencia (sección 11). Lo que el ojo ve son tus números.
  */
 
-import { diaYMesCorto } from './fechas'
+import { diaYMesCorto, diasEntre } from './fechas'
 import { ordenadas, valorPlaneado, valorPrincipal } from './metas'
 import type { Fecha, Medicion, Meta } from '../tipos'
 
 export interface PuntoDeSerie {
   fecha: Fecha
+  /**
+   * A cuántos días del arranque de la meta cae este punto.
+   *
+   * Es lo que se dibuja en el eje de abajo, y no la fecha: un eje de fechas se
+   * dibuja como una fila de casillas del mismo ancho, y entonces cuatro semanas
+   * y cinco meses miden lo mismo en pantalla. En una gráfica de peso la
+   * pendiente **es** el mensaje, así que el eje tiene que ser proporcional al
+   * tiempo o la gráfica miente.
+   */
+  dia: number
   /** Para el eje de abajo: `"15 sept"`. */
   etiqueta: string
   /** Lo que capturaste. `null` en los extremos del plan, donde no mediste. */
@@ -49,6 +59,7 @@ export function serieDe(meta: Meta, mediciones: Medicion[]): PuntoDeSerie[] {
   for (const fecha of delPlan) {
     porFecha.set(fecha, {
       fecha,
+      dia: diasEntre(meta.fechaInicio, fecha),
       etiqueta: diaYMesCorto(fecha),
       real: null,
       plan: redondear(valorPlaneado(meta, fecha)),
@@ -59,6 +70,7 @@ export function serieDe(meta: Meta, mediciones: Medicion[]): PuntoDeSerie[] {
   for (const medicion of conValor) {
     porFecha.set(medicion.fecha, {
       fecha: medicion.fecha,
+      dia: diasEntre(meta.fechaInicio, medicion.fecha),
       etiqueta: diaYMesCorto(medicion.fecha),
       real: valorPrincipal(meta, medicion),
       plan: redondear(valorPlaneado(meta, medicion.fecha)),
@@ -122,24 +134,37 @@ export function ejeDeLaMeta(meta: Meta, puntos: PuntoDeSerie[]): EjeVertical {
   return ejeDeValores(valores)
 }
 
+export interface EjeDeTiempo {
+  /** Días desde el arranque de la meta. Puede ser negativo si mediste antes. */
+  minimo: number
+  maximo: number
+  /** Los días rotulados, repartidos parejo **en el tiempo**. */
+  marcas: number[]
+}
+
 /**
- * Las fechas rotuladas abajo.
+ * El eje de abajo: de cuándo a cuándo va la gráfica y qué días se rotulan.
  *
- * Se eligen de entre las que la serie **ya tiene**, repartidas parejo: así cada
- * etiqueta cae justo debajo de un punto dibujado y ninguna señala un día que la
- * gráfica no enseña. Siempre se rotulan la primera y la última.
+ * Las marcas se reparten parejo en el tiempo, no una por medición. Si midieras
+ * cuatro veces en enero y ninguna en febrero, un rótulo por medición amontonaría
+ * cuatro etiquetas a la izquierda y dejaría febrero mudo, que es justo la
+ * distorsión que este eje viene a quitar.
  */
-export function marcasDeFecha(puntos: PuntoDeSerie[], cuantas = 4): Fecha[] {
-  if (puntos.length <= cuantas) return puntos.map((punto) => punto.fecha)
+export function ejeDeTiempo(puntos: PuntoDeSerie[], cuantas = 4): EjeDeTiempo {
+  if (puntos.length === 0) return { minimo: 0, maximo: 1, marcas: [0, 1] }
 
-  const salto = (puntos.length - 1) / (cuantas - 1)
-  const elegidas = new Set<Fecha>()
-  for (let cuenta = 0; cuenta < cuantas; cuenta += 1) {
-    const punto = puntos[Math.round(cuenta * salto)]
-    if (punto !== undefined) elegidas.add(punto.fecha)
-  }
+  const dias = puntos.map((punto) => punto.dia)
+  const minimo = Math.min(...dias)
+  const maximo = Math.max(...dias)
+  if (maximo === minimo) return { minimo, maximo: minimo + 1, marcas: [minimo] }
 
-  return [...elegidas]
+  const cuantasMarcas = Math.max(2, cuantas)
+  const salto = (maximo - minimo) / (cuantasMarcas - 1)
+  const marcas = Array.from({ length: cuantasMarcas }, (_, cual) =>
+    Math.round(minimo + cual * salto),
+  )
+
+  return { minimo, maximo, marcas: [...new Set(marcas)] }
 }
 
 /** Dos decimales: más que eso es ruido en un kilo o en un punto. */

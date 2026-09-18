@@ -122,6 +122,22 @@ describe('el progreso contra el plan', () => {
     expect(texto).not.toContain('!')
   })
 
+  it('una diferencia que la báscula no mide se dice como ir justo', () => {
+    const meta = metaDePeso()
+    // El 30 de diciembre el plan pide 78.51 kg; pesar 78.5 no es ir adelantado.
+    const progreso = progresoDe(meta, [medicion('peso', '2026-12-30', { peso: 78.5 })], '2026-12-30')
+
+    expect(textoDeProgreso(meta, progreso)).toBe('Vas justo en el plan.')
+  })
+
+  it('las diferencias se redondean a un decimal, sin precisión inventada', () => {
+    const meta = metaDePeso()
+    // Contra la recta del plan la diferencia son 1.28 kg y pico. Se dice 1.3.
+    const progreso = progresoDe(meta, [medicion('peso', '2026-12-30', { peso: 77.23 })], '2026-12-30')
+
+    expect(textoDeProgreso(meta, progreso)).toBe('Vas 1.3 kg adelante del plan.')
+  })
+
   it('celebra el objetivo alcanzado', () => {
     const progreso = progresoDe(META, [medicion('peso', '2027-03-01', { peso: 74.8 })], '2027-03-01')
 

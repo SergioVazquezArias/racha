@@ -10,7 +10,7 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { ejeDeLaMeta, ejeDeValores, marcasDeFecha, serieDe } from './serieMeta'
+import { ejeDeLaMeta, ejeDeTiempo, ejeDeValores, serieDe } from './serieMeta'
 import { medicion, metaDeIngles, metaDePeso, pesadas } from './pruebas/fabricas'
 
 const INICIO = '2026-09-15'
@@ -26,6 +26,18 @@ describe('los puntos de la gráfica', () => {
     expect(serie[0]?.real).toBe(null)
     expect(serie.at(-1)?.fecha).toBe('2027-04-14')
     expect(serie.at(-1)?.plan).toBe(75)
+  })
+
+  it('cada punto sabe a cuántos días del arranque cae', () => {
+    const meta = metaDePeso({ hitos: [] })
+    const serie = serieDe(meta, [
+      medicion('peso', '2026-09-15', { peso: 82 }),
+      medicion('peso', '2026-10-13', { peso: 81 }),
+    ])
+
+    expect(serie.find((punto) => punto.fecha === '2026-09-15')?.dia).toBe(0)
+    expect(serie.find((punto) => punto.fecha === '2026-10-13')?.dia).toBe(28)
+    expect(serie.at(-1)?.dia).toBe(211)
   })
 
   it('cada medición trae su valor real y el del plan de ese día', () => {
@@ -137,30 +149,52 @@ describe('los números del eje vertical', () => {
   })
 })
 
-describe('las fechas rotuladas abajo', () => {
-  it('siempre son fechas que la gráfica dibuja', () => {
-    const meta = metaDePeso()
-    const serie = serieDe(meta, pesadas(INICIO, [82, 81.7, 81.4, 81.2, 81, 80.8, 80.5, 80.2]))
-    const marcas = marcasDeFecha(serie)
+describe('el eje de abajo', () => {
+  const meta = metaDePeso({ hitos: [] })
 
-    for (const marca of marcas) {
-      expect(serie.some((punto) => punto.fecha === marca)).toBe(true)
+  it('reparte el tiempo, no las mediciones', () => {
+    // Cuatro semanas seguidas y luego un hueco de cinco meses: el eje tiene que
+    // dejar el hueco donde está y no repartir los puntos parejo.
+    const serie = serieDe(meta, [
+      ...pesadas(INICIO, [82, 81.7, 81.4, 81.2]),
+      medicion('peso', '2027-03-01', { peso: 77 }),
+    ])
+    const tiempo = ejeDeTiempo(serie)
+
+    expect(tiempo.minimo).toBe(0)
+    expect(tiempo.maximo).toBe(211)
+
+    const separaciones = serie.map((punto) => punto.dia)
+    expect(separaciones).toEqual([0, 7, 14, 21, 167, 211])
+  })
+
+  it('rotula el primero y el último día, y reparte los de en medio', () => {
+    const serie = serieDe(meta, pesadas(INICIO, [82, 81.7, 81.4]))
+    const tiempo = ejeDeTiempo(serie)
+
+    expect(tiempo.marcas[0]).toBe(tiempo.minimo)
+    expect(tiempo.marcas.at(-1)).toBe(tiempo.maximo)
+  })
+
+  it('ninguna marca cae fuera de lo que la gráfica dibuja', () => {
+    const tiempo = ejeDeTiempo(serieDe(meta, pesadas(INICIO, [82, 81.5, 81])))
+
+    for (const marca of tiempo.marcas) {
+      expect(marca).toBeGreaterThanOrEqual(tiempo.minimo)
+      expect(marca).toBeLessThanOrEqual(tiempo.maximo)
     }
   })
 
-  it('rotula la primera y la última', () => {
-    const meta = metaDePeso()
-    const serie = serieDe(meta, pesadas(INICIO, [82, 81.7, 81.4, 81.2, 81, 80.8]))
-    const marcas = marcasDeFecha(serie)
+  it('las marcas van repartidas parejo en el tiempo', () => {
+    const tiempo = ejeDeTiempo(serieDe(meta, pesadas(INICIO, [82, 81.5])), 5)
+    const huecos = tiempo.marcas.slice(1).map((marca, cual) => marca - (tiempo.marcas[cual] ?? 0))
 
-    expect(marcas[0]).toBe(serie[0]?.fecha)
-    expect(marcas.at(-1)).toBe(serie.at(-1)?.fecha)
+    for (const hueco of huecos) {
+      expect(Math.abs(hueco - (huecos[0] ?? 0))).toBeLessThanOrEqual(1)
+    }
   })
 
-  it('con pocos puntos las rotula todas', () => {
-    const meta = metaDePeso()
-    const serie = serieDe(meta, pesadas(INICIO, [82]))
-
-    expect(marcasDeFecha(serie)).toHaveLength(serie.length)
+  it('sin puntos no truena', () => {
+    expect(ejeDeTiempo([]).marcas).toEqual([0, 1])
   })
 })

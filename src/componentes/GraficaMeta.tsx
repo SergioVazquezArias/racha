@@ -28,18 +28,18 @@ import {
 } from 'recharts'
 
 import { bandasVisibles, usaBandasDeIngles } from '../logica/ingles'
-import { ejeDeLaMeta, marcasDeFecha, serieDe } from '../logica/serieMeta'
+import { diaYMesCorto, diasEntre, sumarDias } from '../logica/fechas'
+import { ejeDeLaMeta, ejeDeTiempo, serieDe } from '../logica/serieMeta'
 import { useColoresDeGrafica } from '../pantallas/tema'
 import type { ColoresDeGrafica } from '../pantallas/tema'
-import type { PuntoDeSerie } from '../logica/serieMeta'
+import type { EjeDeTiempo, PuntoDeSerie } from '../logica/serieMeta'
 import type { Medicion, Meta } from '../tipos'
 
 export default function GraficaMeta({ meta, mediciones }: { meta: Meta; mediciones: Medicion[] }) {
   const colores = useColoresDeGrafica()
   const puntos = serieDe(meta, mediciones)
   const eje = ejeDeLaMeta(meta, puntos)
-  const fechas = marcasDeFecha(puntos)
-  const etiquetas = new Map(puntos.map((punto) => [punto.fecha, punto.etiqueta]))
+  const tiempo = ejeDeTiempo(puntos)
 
   return (
     <div className="-ml-2 h-56 w-full">
@@ -60,9 +60,12 @@ export default function GraficaMeta({ meta, mediciones }: { meta: Meta; medicion
           <CartesianGrid stroke={colores.reja} strokeDasharray="2 4" vertical={false} />
 
           <XAxis
-            dataKey="fecha"
-            ticks={fechas}
-            tickFormatter={(fecha: string) => etiquetas.get(fecha) ?? fecha}
+            dataKey="dia"
+            type="number"
+            scale="linear"
+            domain={[tiempo.minimo, tiempo.maximo]}
+            ticks={tiempo.marcas}
+            tickFormatter={(dia: number) => diaYMesCorto(sumarDias(meta.fechaInicio, dia))}
             tick={{ fill: colores.texto, fontSize: 11 }}
             tickLine={false}
             axisLine={{ stroke: colores.reja }}
@@ -102,12 +105,18 @@ export default function GraficaMeta({ meta, mediciones }: { meta: Meta; medicion
           {meta.hitos.map((hito) => (
             <ReferenceDot
               key={`${hito.nombre}:${hito.fecha}`}
-              x={hito.fecha}
+              x={diasEntre(meta.fechaInicio, hito.fecha)}
               y={hito.valor}
               r={5}
               fill={colores.hito}
               stroke={colores.fondo}
               strokeWidth={2}
+              label={{
+                value: hito.nombre,
+                position: ladoDelHito(diasEntre(meta.fechaInicio, hito.fecha), tiempo),
+                fill: colores.hito,
+                fontSize: 10,
+              }}
             />
           ))}
         </ComposedChart>
@@ -147,4 +156,22 @@ function Punto({ cx, cy, payload, colores }: PropiedadesDePunto & { colores: Col
       strokeWidth={2}
     />
   )
+}
+
+/**
+ * De qué lado del marcador se escribe el nombre del hito.
+ *
+ * Encima, salvo cuando el hito cae pegado a un borde: ahí el nombre se saldría
+ * de la gráfica y quedaría cortado. Pegado a la derecha se escribe a la
+ * izquierda del punto, y al revés. El hito de peso cae al 90 % del camino, así
+ * que este caso no es raro: es el que hay.
+ */
+function ladoDelHito(dia: number, tiempo: EjeDeTiempo): 'top' | 'left' | 'right' {
+  const ancho = tiempo.maximo - tiempo.minimo
+  if (ancho <= 0) return 'top'
+
+  const avance = (dia - tiempo.minimo) / ancho
+  if (avance > 0.75) return 'left'
+  if (avance < 0.25) return 'right'
+  return 'top'
 }

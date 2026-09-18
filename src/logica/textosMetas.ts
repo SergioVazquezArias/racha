@@ -27,6 +27,24 @@ export function valorConUnidad(valor: number, unidad: string): string {
 }
 
 /**
+ * Una **diferencia** con su unidad, redondeada a un decimal: `"1.5 kg"`.
+ *
+ * Las diferencias se sacan contra la recta del plan, que pasa por donde sea, y
+ * salen con todos los decimales del mundo. Enseñar «vas 0.08 kg adelante» es
+ * precisión falsa: ninguna báscula de baño mide ochenta gramos, así que ese
+ * número no es información, es ruido con apariencia de dato.
+ */
+export function diferenciaConUnidad(valor: number, unidad: string): string {
+  return `${Math.round(valor * 10) / 10} ${unidad}`
+}
+
+/**
+ * Por debajo de esto, ir adelante o atrás del plan no significa nada y se dice
+ * que vas justo. Es la resolución de una báscula de baño.
+ */
+const DIFERENCIA_QUE_NO_CUENTA = 0.1
+
+/**
  * La proyección, redactada.
  *
  * Son cuatro frases posibles y ninguna deja al usuario adivinando: faltan
@@ -59,9 +77,9 @@ export function textoDeProgreso(meta: Meta, progreso: ProgresoDeMeta): string {
   if (progreso.logrado) return `Objetivo alcanzado: ${valorConUnidad(progreso.valorActual, meta.unidad)}.`
 
   const ventaja = progreso.ventaja ?? 0
-  const distancia = valorConUnidad(Math.abs(ventaja), meta.unidad)
+  if (Math.abs(ventaja) < DIFERENCIA_QUE_NO_CUENTA) return 'Vas justo en el plan.'
 
-  if (Math.abs(ventaja) < 0.05) return 'Vas justo sobre el plan.'
+  const distancia = diferenciaConUnidad(Math.abs(ventaja), meta.unidad)
   return ventaja > 0 ? `Vas ${distancia} adelante del plan.` : `Vas ${distancia} atrás del plan.`
 }
 
@@ -69,7 +87,7 @@ export function textoDeProgreso(meta: Meta, progreso: ProgresoDeMeta): string {
 export function textoDeRestante(meta: Meta, progreso: ProgresoDeMeta): string {
   if (progreso.restante === null) return `Objetivo: ${valorConUnidad(meta.valorObjetivo, meta.unidad)}`
   if (progreso.restante === 0) return 'Ya llegaste al objetivo'
-  return `Faltan ${valorConUnidad(progreso.restante, meta.unidad)}`
+  return `Faltan ${diferenciaConUnidad(progreso.restante, meta.unidad)}`
 }
 
 /**
