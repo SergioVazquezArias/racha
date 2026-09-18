@@ -461,7 +461,7 @@ Interacción diaria real: **tres toques**. Los cinco negativos no piden nada.
 | 01 | Este documento en el repo + `CLAUDE.md` + primer commit. **Hecha.** |
 | 02 | Esqueleto Vite/React/TS + tipos + repositorio + datos de ejemplo. **Hecha.** |
 | 03 | `src/logica/rachas.ts` con pruebas de Vitest. **Hecha.** |
-| 04 | Pantalla Hoy + registro de recaídas |
+| 04 | Pantalla Hoy + registro de recaídas. **Hecha.** |
 | 05 | Modo discreto |
 | 06 | Hábitos, CRUD completo y Estadísticas |
 | 07 | Metas, mediciones y gráficas |

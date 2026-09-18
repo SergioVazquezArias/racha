@@ -64,6 +64,19 @@ export function guardarSemana(semana: Semana): void {
   modificar((documento) => colocar(documento.semanas, semana))
 }
 
+/**
+ * Varios veredictos de golpe, en una sola escritura.
+ *
+ * Lo usa el cierre de semanas al arrancar la app: si pasaron varias semanas sin
+ * abrirla, se guardan todas juntas y no una por una.
+ */
+export function guardarSemanas(semanas: Semana[]): void {
+  if (semanas.length === 0) return
+  modificar((documento) => {
+    for (const semana of semanas) colocar(documento.semanas, semana)
+  })
+}
+
 /** Los comodines gastados. Uno al mes, sin acumular (sección 7). */
 export function obtenerComodines(): Comodin[] {
   return leerDocumento().comodines

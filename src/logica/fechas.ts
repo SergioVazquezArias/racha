@@ -9,8 +9,9 @@
  */
 
 import { addDays, format, getISOWeek, getISOWeekYear, startOfISOWeek } from 'date-fns'
+import { es } from 'date-fns/locale'
 
-import type { ClaveSemana, Fecha } from '../tipos'
+import type { ClaveSemana, Fecha, Hora } from '../tipos'
 
 /** Convierte una fecha de JavaScript a `"YYYY-MM-DD"`, en hora local. */
 export function aFecha(fecha: Date): Fecha {
@@ -61,4 +62,39 @@ export function diasEntre(desde: Fecha, hasta: Fecha): number {
   const milisegundosPorDia = 24 * 60 * 60 * 1000
   const diferencia = deFecha(hasta).getTime() - deFecha(desde).getTime()
   return Math.round(diferencia / milisegundosPorDia)
+}
+
+/**
+ * La hora del reloj del teléfono, `"HH:MM"`.
+ *
+ * La usa el registro de recaídas, que pone la hora solo (sección 10). Es lo
+ * único de este archivo que mira el reloj además de `hoy()`.
+ */
+export function horaActual(): Hora {
+  return format(new Date(), 'HH:mm')
+}
+
+/** Una fecha escrita en palabras: `"miércoles 17 de septiembre"`. */
+export function fechaEnPalabras(fecha: Fecha): string {
+  return conMayuscula(format(deFecha(fecha), "EEEE d 'de' MMMM", { locale: es }))
+}
+
+/**
+ * El rango de la semana en palabras, para el encabezado del resumen.
+ *
+ * Si la semana no cambia de mes dice `"15 al 21 de septiembre"`; si lo cruza,
+ * nombra los dos meses: `"29 de septiembre al 5 de octubre"`.
+ */
+export function semanaEnPalabras(fecha: Fecha): string {
+  const dias = diasDeLaSemana(fecha)
+  const lunes = deFecha(dias[0] ?? fecha)
+  const domingo = deFecha(dias[6] ?? fecha)
+  const mismoMes = format(lunes, 'yyyy-MM') === format(domingo, 'yyyy-MM')
+  const inicio = mismoMes ? format(lunes, 'd') : format(lunes, "d 'de' MMMM", { locale: es })
+  return `${inicio} al ${format(domingo, "d 'de' MMMM", { locale: es })}`
+}
+
+/** Pone en mayúscula la primera letra. `date-fns` devuelve los días en minúscula. */
+function conMayuscula(texto: string): string {
+  return texto.charAt(0).toUpperCase() + texto.slice(1)
 }

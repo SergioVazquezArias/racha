@@ -1,52 +1,58 @@
 /**
- * Cartel provisional de la fase 02.
+ * El armazón de la app: la pantalla de la pestaña activa y la barra de abajo.
  *
- * Todavía no hay pantallas: esto solo confirma que los datos de ejemplo se
- * sembraron bien en el teléfono. En la fase 04 lo reemplaza la pantalla Hoy.
- *
- * No muestra el nombre de ningún hábito a propósito. El nombre visible siempre
- * se obtiene con `mostrarNombre(habito)`, que llega en la fase 05 con el modo
- * discreto (regla 7).
+ * No hay enrutador ni dirección en la barra del navegador, a propósito: son
+ * cuatro pantallas dentro de una app instalada en la pantalla de inicio, y una
+ * dependencia más no se paga sola. La pestaña activa vive en memoria; al cerrar
+ * y volver a abrir, la app arranca en Hoy, que es lo que se quiere ver.
  */
 
-import {
-  obtenerHabitosActivos,
-  obtenerMediciones,
-  obtenerMetas,
-  obtenerRegistros,
-  obtenerSemanas,
-} from './datos/repositorio'
+import { useState } from 'react'
+
+import BarraPestanas from './componentes/BarraPestanas'
+import Hoy from './pantallas/Hoy'
+import Pendiente from './pantallas/Pendiente'
+import type { Pestana } from './pantallas/pestanas'
 
 export default function App() {
-  const cuentas = [
-    { etiqueta: 'Hábitos activos', valor: obtenerHabitosActivos().length },
-    { etiqueta: 'Registros', valor: obtenerRegistros().length },
-    { etiqueta: 'Semanas cerradas', valor: obtenerSemanas().length },
-    { etiqueta: 'Metas', valor: obtenerMetas().length },
-    { etiqueta: 'Mediciones', valor: obtenerMediciones().length },
-  ]
+  const [pestana, setPestana] = useState<Pestana>('hoy')
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-6 p-6">
-      <header>
-        <h1 className="text-3xl font-semibold tracking-tight">Racha</h1>
-        <p className="mt-1 text-sm text-neutral-500">
-          Fase 02 lista: tipos, repositorio y datos de ejemplo.
-        </p>
-      </header>
+    <>
+      <main className="min-h-dvh">{pantallaDe(pestana)}</main>
+      <BarraPestanas activa={pestana} alCambiar={setPestana} />
+    </>
+  )
+}
 
-      <dl className="divide-y divide-neutral-200 rounded-xl border border-neutral-200">
-        {cuentas.map((cuenta) => (
-          <div key={cuenta.etiqueta} className="flex items-baseline justify-between px-4 py-3">
-            <dt className="text-sm text-neutral-600">{cuenta.etiqueta}</dt>
-            <dd className="text-lg font-medium tabular-nums">{cuenta.valor}</dd>
-          </div>
-        ))}
-      </dl>
+function pantallaDe(pestana: Pestana) {
+  if (pestana === 'hoy') return <Hoy />
 
-      <p className="text-xs text-neutral-500">
-        Las pantallas llegan en la fase 04.
-      </p>
-    </main>
+  if (pestana === 'habitos') {
+    return (
+      <Pendiente
+        titulo="Hábitos"
+        fase="fase 06"
+        descripcion="Alta, edición y archivado de hábitos, con el detalle de cada uno y su historial de semanas."
+      />
+    )
+  }
+
+  if (pestana === 'metas') {
+    return (
+      <Pendiente
+        titulo="Metas"
+        fase="fase 07"
+        descripcion="Las metas de mediano plazo con sus mediciones, su gráfica y la proyección."
+      />
+    )
+  }
+
+  return (
+    <Pendiente
+      titulo="Stats"
+      fase="fase 06"
+      descripcion="Cumplimiento a 30 días, mejor racha y los patrones de recaída por día, por hora y por contexto."
+    />
   )
 }

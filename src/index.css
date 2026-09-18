@@ -1,8 +1,61 @@
 @import 'tailwindcss';
 
-/* Estilos base de la app. La paleta y el tema claro/oscuro llegan en la fase 04,
-   junto con la pantalla Hoy. */
+/**
+ * Estilos base de la app.
+ *
+ * Está pensada para un iPhone 16 usado con el pulgar: nada de anchos de
+ * escritorio, botones grandes y la barra de pestañas respetando la franja del
+ * gesto de inicio.
+ */
+
 html {
-  /* Evita que iOS agrande el texto al girar el teléfono. */
+  /* iOS agranda el texto al girar el teléfono si no se le dice que no. */
   -webkit-text-size-adjust: 100%;
+  /* La app sigue el tema del sistema; `ajustes.tema` nace en "sistema". */
+  color-scheme: light dark;
+  background-color: #f5f5f4;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    background-color: #0c0a09;
+  }
+}
+
+body {
+  margin: 0;
+  /* Sin rebote elástico al jalar: se siente app, no página web. */
+  overscroll-behavior-y: none;
+  /* Sin el destello gris de iOS al tocar un botón. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* El hueco de la franja del gesto de inicio, abajo de la barra de pestañas. */
+.borde-inferior-seguro {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+/* Lo mismo arriba, para la isla dinámica. */
+.borde-superior-seguro {
+  padding-top: max(1rem, env(safe-area-inset-top));
+}
+
+/* La hoja de recaída sube desde abajo en lugar de aparecer de golpe. */
+@keyframes subir-hoja {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.hoja-que-sube {
+  animation: subir-hoja 0.22s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hoja-que-sube {
+    animation: none;
+  }
 }

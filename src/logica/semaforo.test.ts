@@ -8,7 +8,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { claveSemana, diasDeLaSemana } from './fechas'
-import { colorDeSemana, evaluarSemana } from './semaforo'
+import { colorDeSemana, evaluarSemana, hechosDeSemana } from './semaforo'
 import { cumplidos, habitoSemanal } from './pruebas/fabricas'
 
 /** Una semana cualquiera de 2026, de lunes a domingo. */
@@ -79,5 +79,25 @@ describe('al cerrar una semana', () => {
     const semana = evaluarSemana(reciente, CLAVE, cumplidos(reciente.id, DIAS))
 
     expect(semana.hechos).toBe(4)
+  })
+})
+
+describe('lo hecho en la semana en curso', () => {
+  const habito = habitoSemanal('2026-01-01', 5, 3)
+
+  it('cuenta las marcas que lleva la semana, sin juzgarla todavía', () => {
+    const registros = cumplidos(habito.id, DIAS.slice(0, 3))
+
+    expect(hechosDeSemana(habito, CLAVE, registros)).toBe(3)
+  })
+
+  it('una semana sin marcas lleva cero, y eso no la pinta de rojo', () => {
+    expect(hechosDeSemana(habito, CLAVE, [])).toBe(0)
+  })
+
+  it('es el mismo número que usa el veredicto al cerrar la semana', () => {
+    const registros = cumplidos(habito.id, DIAS.slice(0, 4))
+
+    expect(hechosDeSemana(habito, CLAVE, registros)).toBe(evaluarSemana(habito, CLAVE, registros).hechos)
   })
 })

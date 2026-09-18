@@ -36,11 +36,27 @@ export function claveDeSemana(semana: Semana): ClaveSemana {
 }
 
 /**
- * Cierra una semana y emite su veredicto.
+ * Cuántos días se cumplió un hábito dentro de una semana.
  *
- * Cuenta los días cumplidos de ese hábito dentro de esa semana. No mira días
- * anteriores a `creadoEn`: un hábito nuevo nunca inventa fallas de días en que
- * no existía (sección 9).
+ * No mira días anteriores a `creadoEn`: un hábito nuevo nunca inventa fallas de
+ * días en que no existía (sección 9).
+ *
+ * Sirve para dos cosas y por eso vive aparte: el veredicto de una semana ya
+ * terminada y el progreso de la semana en curso que la pantalla Hoy muestra
+ * como «3 de 5». Es el mismo número contado una sola vez.
+ */
+export function hechosDeSemana(habito: Habito, clave: ClaveSemana, registros: Registro[]): number {
+  return registros.filter(
+    (registro) =>
+      registro.habitoId === habito.id &&
+      registro.estado === 'cumplido' &&
+      registro.fecha >= habito.creadoEn &&
+      claveSemana(registro.fecha) === clave,
+  ).length
+}
+
+/**
+ * Cierra una semana y emite su veredicto.
  *
  * `comodinUsado` nace en `false`. Lo prende quien aplica el comodín, no el
  * cierre de la semana.
@@ -48,14 +64,7 @@ export function claveDeSemana(semana: Semana): ClaveSemana {
 export function evaluarSemana(habito: Habito, clave: ClaveSemana, registros: Registro[]): Semana {
   const objetivo = habito.objetivo ?? 1
   const minimo = habito.minimo ?? 1
-
-  const hechos = registros.filter(
-    (registro) =>
-      registro.habitoId === habito.id &&
-      registro.estado === 'cumplido' &&
-      registro.fecha >= habito.creadoEn &&
-      claveSemana(registro.fecha) === clave,
-  ).length
+  const hechos = hechosDeSemana(habito, clave, registros)
 
   return {
     id: `${habito.id}:${clave}`,

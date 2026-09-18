@@ -16,6 +16,7 @@ export {
   guardarHabito,
   guardarRegistro,
   guardarSemana,
+  guardarSemanas,
   obtenerComodines,
   obtenerHabitos,
   obtenerHabitosActivos,
