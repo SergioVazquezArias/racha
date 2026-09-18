@@ -51,8 +51,9 @@ export default function BorrarTodo() {
             teléfono no queda copia.
           </p>
           <p>
-            La app queda <strong className="font-medium">como recién instalada</strong>, con los hábitos y las
-            metas de ejemplo, para que no tengas que escribirlo todo desde la nada.
+            Quedan puestos los ocho hábitos y las dos metas, para que no tengas que escribirlos desde la
+            nada, y <strong className="font-medium">nada más</strong>: las rachas empiezan en cero de verdad,
+            contando desde hoy.
           </p>
         </ConfirmarConPalabra>
       )}

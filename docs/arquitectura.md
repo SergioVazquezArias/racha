@@ -575,9 +575,22 @@ aviso que se apaga sin que haya respaldo no sirve de nada.
 
 ### Borrar todo
 
-Botón al final de Ajustes, apartado del resto. Pide escribir `BORRAR` y deja el
-teléfono **como recién instalado**, con los hábitos y las metas de ejemplo, para
-no tener que escribir ocho hábitos desde la nada para volver a empezar.
+Botón al final de Ajustes, apartado del resto. Pide escribir `BORRAR` y deja
+puestos los ocho hábitos y las dos metas —para no tener que escribirlos desde la
+nada— y **nada más**: ni un día registrado, ni una semana cerrada, ni un
+comodín, ni una medición. Las rachas empiezan en cero de verdad.
+
+No es lo mismo que una instalación nueva, que sí trae historial de ejemplo para
+que ninguna pantalla se vea vacía el primer día.
+
+**Y no basta con vaciar las listas.** Los hábitos de ejemplo nacen setenta y
+siete días atrás, que es donde arranca ese historial. Si se les dejara esa
+fecha, la app al abrirse cerraría once semanas pasadas **y las once saldrían
+rojas**, porque un hábito sin un solo día marcado no cumple ningún objetivo:
+serían justo las semanas inventadas que el botón existe para no dejar. Por eso
+todos nacen hoy, y la semana a medias en que se borró no se juzga (sección 9):
+la primera semana calificada es la del lunes siguiente. Lo vigila
+`src/datos/ejemplo/documento.test.ts`.
 
 ---
 

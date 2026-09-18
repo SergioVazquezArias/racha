@@ -6,7 +6,7 @@
  * `localStorage`; el resto del repositorio pasa por aquí (regla 5).
  */
 
-import { documentoDeEjemplo, documentoVacio } from '../ejemplo/documento'
+import { documentoDeEjemplo, documentoEnLimpio, documentoVacio } from '../ejemplo/documento'
 import type { DocumentoRacha } from '../../tipos'
 
 /** La llave de `localStorage`. El `v1` permite migrar mañana sin pisar lo viejo. */
@@ -85,14 +85,19 @@ export function importarDocumento(documento: DocumentoRacha): void {
 /**
  * Borrar todo y empezar de cero (sección 14).
  *
- * Deja el teléfono **como recién instalado**: no un hueco vacío, sino lo mismo
- * que vería alguien que abre Racha por primera vez, con los hábitos y las metas
- * de ejemplo. Así no hay que escribir ocho hábitos desde la nada para volver a
- * empezar: se editan los que ya están.
+ * Deja los ocho hábitos y las dos metas puestos, para no tener que escribirlos
+ * desde la nada, y **nada más**: ni un día registrado, ni una semana cerrada,
+ * ni una medición. No es lo mismo que una instalación nueva, que sí trae
+ * historial de ejemplo para que ninguna pantalla se vea vacía el primer día;
+ * aquí las rachas empiezan en cero de verdad.
+ *
+ * Los detalles de por qué eso no es solo vaciar listas están en
+ * `documentoEnLimpio`, junto a las pruebas que lo vigilan.
  */
 export function empezarDeCero(): DocumentoRacha {
-  borrarTodo()
-  return inicializar()
+  const documento = documentoEnLimpio()
+  guardarDocumento(documento)
+  return documento
 }
 
 /** Lee, deja que la función cambie el documento y lo vuelve a guardar. */
