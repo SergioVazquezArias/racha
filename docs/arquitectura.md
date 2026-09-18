@@ -31,7 +31,7 @@ cambios. Toda comunicación, interfaz, comentarios y mensajes van **en español*
 |---|---|
 | Base | Vite + React + TypeScript |
 | Estilos | Tailwind CSS |
-| Persistencia | `localStorage`, encapsulado en `src/datos/repositorio.ts` |
+| Persistencia | `localStorage`, encapsulado en `src/datos/repositorio/` |
 | Fechas | `date-fns` |
 | Gráficas | Recharts |
 | Pruebas | Vitest (solo lógica, no interfaz) |
@@ -51,7 +51,7 @@ Estas reglas van en `CLAUDE.md` y aplican a todo el código.
    ninguna racha.
 3. **TypeScript estricto.** Sin `any`.
 4. **Ningún archivo arriba de 200 líneas.** Si crece, se parte.
-5. **Todo acceso a datos pasa por `src/datos/repositorio.ts`.** Ningún
+5. **Todo acceso a datos pasa por `src/datos/repositorio/`.** Ningún
    componente toca `localStorage` directamente.
 6. **Los hábitos positivos y negativos son componentes separados.** Nunca se
    unifican en uno con una bandera. La razón está en la sección 5.
@@ -122,6 +122,25 @@ El veredicto de cada semana, calculado una vez al cerrarla y **guardado**.
   color: "verde" | "ambar" | "rojo"
   comodinUsado: boolean
   cerrada: boolean
+}
+```
+
+### Comodin
+
+Un comodín gastado. Congela un día fallado o una semana roja: la racha no
+crece, pero tampoco se rompe.
+
+Se guarda como entidad propia y no como una bandera dentro de `Semana`
+porque hacen falta las dos fechas: sin ellas no se puede comprobar ni el
+límite de tres días hacia atrás ni la regla de uno al mes. El `comodinUsado`
+de `Semana` se queda solo para pintar el escudo en el historial.
+
+```ts
+{
+  id: string                // `${habitoId}:${fecha}`
+  habitoId: string
+  fecha: string             // el día que queda congelado
+  aplicadoEn: string        // el día en que se gastó; decide de qué mes sale
 }
 ```
 
@@ -251,6 +270,10 @@ muestra visualmente distinto.
 - En el historial la semana lleva un escudo. **Nunca se pinta verde.**
 - Aplicable **retroactivamente hasta 3 días**.
 - **No aplica a hábitos negativos**, nunca.
+
+El cupo del mes es del usuario, no de cada hábito: se cuenta por el
+`aplicadoEn` del `Comodin`, así que un comodín gastado el 1 de septiembre
+sobre el 30 de agosto sale del cupo de septiembre.
 
 ---
 
@@ -430,9 +453,9 @@ Interacción diaria real: **tres toques**. Los cinco negativos no piden nada.
 | Fase | Contenido |
 |---|---|
 | 00 | Instalación de herramientas. **Hecha.** |
-| 01 | Este documento en el repo + `CLAUDE.md` + primer commit |
-| 02 | Esqueleto Vite/React/TS + tipos + repositorio + datos de ejemplo |
-| 03 | `src/logica/rachas.ts` con pruebas de Vitest |
+| 01 | Este documento en el repo + `CLAUDE.md` + primer commit. **Hecha.** |
+| 02 | Esqueleto Vite/React/TS + tipos + repositorio + datos de ejemplo. **Hecha.** |
+| 03 | `src/logica/rachas.ts` con pruebas de Vitest. **Hecha.** |
 | 04 | Pantalla Hoy + registro de recaídas |
 | 05 | Modo discreto |
 | 06 | Hábitos, CRUD completo y Estadísticas |

@@ -38,7 +38,7 @@ Aplican a todo el código. Son la sección 3 de `docs/arquitectura.md`.
    racha.
 3. **TypeScript estricto.** Sin `any`.
 4. **Ningún archivo arriba de 200 líneas.** Si crece, se parte.
-5. **Todo acceso a datos pasa por `src/datos/repositorio.ts`.** Ningún componente
+5. **Todo acceso a datos pasa por `src/datos/repositorio/`.** Ningún componente
    toca `localStorage` directamente.
 6. **Los hábitos positivos y negativos son componentes separados.** Nunca se
    unifican en uno con una bandera. La razón está en la sección 5 del documento.
@@ -56,10 +56,10 @@ Aplican a todo el código. Son la sección 3 de `docs/arquitectura.md`.
 |---|---|
 | Base | Vite + React + TypeScript |
 | Estilos | Tailwind CSS |
-| Persistencia | `localStorage`, encapsulado en `src/datos/repositorio.ts` |
+| Persistencia | `localStorage`, encapsulado en `src/datos/repositorio/` |
 | Fechas | `date-fns` |
 | Gráficas | Recharts |
-| Pruebas | Vitest (solo lógica, no interfaz) |
+| Pruebas | Vitest (solo lógica, no interfaz). `npm test` |
 | PWA | `vite-plugin-pwa` |
 | Hosting | GitHub Pages con GitHub Actions |
 
@@ -72,7 +72,7 @@ Aplican a todo el código. Son la sección 3 de `docs/arquitectura.md`.
 | 00 | Instalación de herramientas | Hecha |
 | 01 | Documento en el repo + `CLAUDE.md` + primer commit | Hecha |
 | 02 | Esqueleto Vite/React/TS + tipos + repositorio + datos de ejemplo | Hecha |
-| 03 | `src/logica/rachas.ts` con pruebas de Vitest | |
+| 03 | `src/logica/rachas.ts` con pruebas de Vitest | Hecha |
 | 04 | Pantalla Hoy + registro de recaídas | |
 | 05 | Modo discreto | |
 | 06 | Hábitos, CRUD completo y Estadísticas | |
