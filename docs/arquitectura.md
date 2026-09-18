@@ -403,7 +403,7 @@ día, y por contexto. Ejemplo: *"71 % de tus recaídas son viernes o sábado"*.
 | Objetivo | 72.0 kg el 2027-04-14 |
 | Campos medidos | peso, cintura, pecho, cuello |
 | Frecuencia | semanal, domingo |
-| Hito | "Mitad del camino" en 75.7 kg |
+| Hito | "Mitad del camino" en 76 kg, el 2026-12-29 |
 | Hábitos vinculados | gym, sin refresco, sin postre |
 
 Ritmo implícito: 0.27 kg por semana.
@@ -429,7 +429,7 @@ avisándolo en pantalla con una línea de texto. Nada oculto.
 
 | Campo | Valor |
 |---|---|
-| Inicio | 50 puntos provisionales, puntaje base pendiente (llega el 2026-10-01) |
+| Inicio | 50 puntos provisionales; el base real llega con el primer examen, el 2026-10-01 |
 | Objetivo | 70 puntos (umbral B2) el 2027-09-15 |
 | Campos medidos | puntaje 0–100 |
 | Frecuencia | mensual |
@@ -507,7 +507,7 @@ Interacción diaria real: **tres toques**. Los cinco negativos no piden nada.
 | 04 | Pantalla Hoy + registro de recaídas. **Hecha.** |
 | 05 | Modo discreto. **Hecha.** |
 | 06 | Hábitos, CRUD completo y Estadísticas. **Hecha.** |
-| 07 | Metas, mediciones y gráficas |
+| 07 | Metas, mediciones y gráficas. **Hecha.** |
 | 08 | PWA, GitHub Pages e instalación en el iPhone |
 | 09 | Respaldo y cierre de la v1 |
 | 10 | README y portafolio |

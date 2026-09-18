@@ -125,3 +125,13 @@ export function semanaEnPalabras(fecha: Fecha): string {
 function conMayuscula(texto: string): string {
   return texto.charAt(0).toUpperCase() + texto.slice(1)
 }
+
+/** El día y el mes en palabras, sin año: `"2 de abril"`. Para la proyección. */
+export function diaYMesEnPalabras(fecha: Fecha): string {
+  return format(deFecha(fecha), "d 'de' MMMM", { locale: es })
+}
+
+/** La fecha completa en palabras: `"14 de abril de 2027"`. Para las metas cerradas. */
+export function fechaLargaEnPalabras(fecha: Fecha): string {
+  return format(deFecha(fecha), "d 'de' MMMM 'de' yyyy", { locale: es })
+}

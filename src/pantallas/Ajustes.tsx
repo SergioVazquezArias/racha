@@ -6,16 +6,31 @@
  * cuatro es lo que cabe cómodo con el pulgar, y aquí se entra una vez al mes,
  * no a diario.
  *
- * Por ahora solo trae el interruptor de nombres reales. Las fases 06 y 09 le
- * agregan el alta de hábitos y metas, el tema, la estatura, el recordatorio de
- * medición y el respaldo.
+ * Trae el interruptor de nombres reales y la estatura. La fase 09 le agrega el
+ * tema, el recordatorio de medición y el respaldo.
  */
 
+import { useState } from 'react'
+
+import { CampoDecimal } from '../componentes/CamposDeMedida'
 import { Interruptor } from '../componentes/CamposDeFormulario'
+import { guardarAjustes, obtenerAjustes } from '../datos/repositorio'
 import { useDiscrecion } from './discrecion'
 
 export default function Ajustes({ alCerrar }: { alCerrar: () => void }) {
   const { mostrarNombresReales, alternarNombresReales } = useDiscrecion()
+  const [estatura, setEstatura] = useState<number | null>(() => obtenerAjustes().estaturaCm)
+
+  /**
+   * La estatura se guarda en cuanto es un número con sentido. Una persona no
+   * mide 3 cm ni 900: un número imposible se queda en la pantalla sin guardarse,
+   * porque torcería la grasa estimada sin avisar.
+   */
+  function cambiarEstatura(centimetros: number | null) {
+    setEstatura(centimetros)
+    if (centimetros === null || centimetros < 100 || centimetros > 250) return
+    guardarAjustes({ ...obtenerAjustes(), estaturaCm: centimetros })
+  }
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-100 dark:bg-stone-950">
@@ -48,8 +63,26 @@ export default function Ajustes({ alCerrar }: { alCerrar: () => void }) {
             de reojo.
           </p>
         </section>
+
+        <section className="mt-8">
+          <h2 className="mb-2 text-sm font-medium text-neutral-900 dark:text-neutral-100">Tu cuerpo</h2>
+
+          <div className="rounded-2xl bg-white p-4 dark:bg-neutral-900">
+            <CampoDecimal
+              etiqueta="Estatura"
+              unidad="cm"
+              valor={estatura}
+              alCambiar={cambiarEstatura}
+              placeholder="175"
+            />
+          </div>
+
+          <p className="mt-2 px-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
+            Se usa para estimar el porcentaje de grasa corporal a partir de la cintura y el cuello. Es lo
+            único para lo que sirve, y la estimación se presenta siempre como eso: una estimación.
+          </p>
+        </section>
       </div>
     </div>
   )
 }
-

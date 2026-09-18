@@ -14,7 +14,7 @@ import ProveedorDiscrecion from './pantallas/ProveedorDiscrecion'
 import Estadisticas from './pantallas/Estadisticas'
 import Habitos from './pantallas/Habitos'
 import Hoy from './pantallas/Hoy'
-import Pendiente from './pantallas/Pendiente'
+import Metas from './pantallas/Metas'
 import type { Pestana } from './pantallas/pestanas'
 
 export default function App() {
@@ -36,15 +36,7 @@ function pantallaDe(pestana: Pestana) {
 
   if (pestana === 'habitos') return <Habitos />
 
-  if (pestana === 'metas') {
-    return (
-      <Pendiente
-        titulo="Metas"
-        fase="fase 07"
-        descripcion="Las metas de mediano plazo con sus mediciones, su gráfica y la proyección."
-      />
-    )
-  }
+  if (pestana === 'metas') return <Metas />
 
   return <Estadisticas />
 }

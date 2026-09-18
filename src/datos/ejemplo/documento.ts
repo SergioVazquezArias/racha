@@ -8,7 +8,7 @@
 
 import { habitosDeEjemplo } from './habitos'
 import { historialDeEjemplo } from './historial'
-import { medicionesDeEjemplo, metasDeEjemplo } from './metas'
+import { medicionesIniciales, metasIniciales } from './metas'
 import type { Ajustes, DocumentoRacha } from '../../tipos'
 
 /** Ajustes de fábrica de una instalación nueva. */
@@ -33,18 +33,24 @@ export function documentoVacio(): DocumentoRacha {
   }
 }
 
-/** Documento con los datos de ejemplo, para que ninguna pantalla nazca vacía. */
+/**
+ * Documento de una instalación nueva: los ocho hábitos de la sección 12 con un
+ * historial de ejemplo, y las **dos metas de ejemplo** de la sección 11 con una
+ * sola medición. Los hábitos nacen con historia para que ninguna pantalla se vea
+ * vacía el primer día; las metas casi no, porque las medidas del cuerpo son del
+ * usuario: las suyas las captura él, desde el primer domingo.
+ */
 export function documentoDeEjemplo(): DocumentoRacha {
   const habitos = habitosDeEjemplo()
   const { registros, semanas } = historialDeEjemplo(habitos)
-  const metas = metasDeEjemplo(habitos)
+  const metas = metasIniciales(habitos)
   return {
     habitos,
     registros,
     semanas,
     comodines: [],
     metas,
-    mediciones: medicionesDeEjemplo(metas),
+    mediciones: medicionesIniciales(metas),
     ajustes: AJUSTES_INICIALES,
   }
 }

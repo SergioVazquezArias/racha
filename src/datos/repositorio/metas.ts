@@ -33,6 +33,13 @@ export function guardarMedicion(medicion: Medicion): void {
   modificar((documento) => colocar(documento.mediciones, medicion))
 }
 
+/** Borra una medición suelta: la que se capturó con el dedo torcido. */
+export function eliminarMedicion(medicionId: string): void {
+  modificar((documento) => {
+    documento.mediciones = documento.mediciones.filter((medicion) => medicion.id !== medicionId)
+  })
+}
+
 export function obtenerAjustes(): Ajustes {
   return leerDocumento().ajustes
 }

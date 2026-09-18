@@ -24,6 +24,7 @@ export {
   obtenerSemanas,
 } from './habitos'
 export {
+  eliminarMedicion,
   eliminarMeta,
   guardarAjustes,
   guardarMedicion,

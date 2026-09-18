@@ -1,10 +1,9 @@
 /**
  * Las cuatro pestañas de abajo.
  *
- * En esta fase solo funciona **Hoy**, que es la única pantalla que se abre a
- * diario (sección 13). Las otras tres ya están en su lugar, con su ícono y su
- * nombre, y avisan en qué fase llegan: así la app se siente completa al
- * navegarla y no hay que rehacer la barra más adelante.
+ * Desde la fase 07 las cuatro llevan a una pantalla de verdad. **Hoy** sigue
+ * siendo la única que se abre a diario (sección 13); las otras tres se visitan
+ * cuando hay algo que revisar, que corregir o que medir.
  */
 
 export type Pestana = 'hoy' | 'habitos' | 'metas' | 'stats'
