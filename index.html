@@ -5,6 +5,20 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Racha</title>
+
+    <!-- iOS: la app agregada a la pantalla de inicio abre sin barra de Safari. -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <!-- La hora y la batería se dibujan encima del fondo de la app, no sobre
+         una franja aparte: por eso la app respeta los bordes seguros. -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- El nombre que queda debajo del ícono en la pantalla de inicio. -->
+    <meta name="apple-mobile-web-app-title" content="Racha" />
+    <link rel="apple-touch-icon" href="/icono-apple-180.png" />
+
+    <!-- El color del borde de la ventana, según el teléfono esté claro u oscuro. -->
+    <meta name="theme-color" content="#f5f5f4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0c0a09" media="(prefers-color-scheme: dark)" />
   </head>
   <body>
     <div id="root"></div>

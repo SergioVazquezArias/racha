@@ -10,6 +10,9 @@
 import { describe, expect, it } from 'vitest'
 
 import { anclaDeLaFecha, ladoDelHito } from './rotulos'
+import { ejeDeTiempo, serieDe } from './serieMeta'
+import { metaDePeso } from './pruebas/fabricas'
+import { sumarDias } from './fechas'
 import type { EjeDeTiempo } from './serieMeta'
 
 /** El eje de la meta de peso: del día 0 al 211. */
@@ -32,6 +35,30 @@ describe('de dónde se agarra una fecha del eje de abajo', () => {
   it('una fecha fuera del eje se trata como la orilla que le toca', () => {
     expect(anclaDeLaFecha(300, TIEMPO)).toBe('end')
     expect(anclaDeLaFecha(-20, TIEMPO)).toBe('start')
+  })
+})
+
+/**
+ * La costura entre las dos piezas, que es por donde esto se puede volver a
+ * romper solo: `ejeDeTiempo` decide dónde caen las marcas y `anclaDeLaFecha`
+ * decide cómo se agarra cada una. Si la última marca dejara de caer justo en el
+ * final del eje, se agarraría del centro otra vez y «14 abr» volvería a
+ * cortarse, sin que ninguna de las pruebas de arriba se enterara.
+ */
+describe('la última marca del eje que de verdad se dibuja', () => {
+  it('cae exactamente en el final del eje, dure lo que dure la meta', () => {
+    for (const dias of [7, 30, 100, 211, 365, 1000]) {
+      const meta = metaDePeso({ fechaObjetivo: sumarDias('2026-09-15', dias) })
+      const tiempo = ejeDeTiempo(serieDe(meta, []))
+
+      expect(tiempo.marcas.at(-1) ?? -1).toBe(tiempo.maximo)
+    }
+  })
+
+  it('y por eso se agarra del final, que es lo que evita que se corte', () => {
+    const tiempo = ejeDeTiempo(serieDe(metaDePeso(), []))
+
+    expect(anclaDeLaFecha(tiempo.marcas.at(-1) ?? -1, tiempo)).toBe('end')
   })
 })
 

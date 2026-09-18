@@ -1,0 +1,67 @@
+# Compila Racha y la publica en GitHub Pages con cada push a main.
+#
+# No hay nada que hacer a mano: se sube un cambio y en un par de minutos la app
+# está en línea. Si una prueba falla, no se publica nada y la versión en línea
+# se queda como estaba.
+
+name: Publicar
+
+on:
+  push:
+    branches: [main]
+  # Permite lanzarlo a mano desde la pestaña Actions, sin subir nada.
+  workflow_dispatch:
+
+# Los permisos mínimos: leer el código y poder escribir en Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Si se suben dos cambios seguidos, gana el último: no tiene sentido publicar
+# una versión que ya quedó vieja mientras se compilaba.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  compilar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bajar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node, reaprovechando la caché de paquetes
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar las librerías, exactamente las del package-lock
+        run: npm ci
+
+      - name: Correr las pruebas; si una falla, aquí se detiene todo
+        run: npm test
+
+      - name: Compilar la app a su versión final
+        run: npm run build
+
+      - name: Preparar la publicación
+        uses: actions/configure-pages@v5
+
+      - name: Entregar la carpeta compilada a Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  publicar:
+    # Solo corre si el trabajo de arriba terminó bien.
+    needs: compilar
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - name: Ponerla en línea
+        id: despliegue
+        uses: actions/deploy-pages@v4

@@ -38,6 +38,30 @@ cambios. Toda comunicación, interfaz, comentarios y mensajes van **en español*
 | PWA | `vite-plugin-pwa` |
 | Hosting | GitHub Pages con GitHub Actions |
 
+### Publicación (fase 08)
+
+La app vive en `https://sergiovazquezarias.github.io/racha/`. Como no está en la
+raíz del dominio sino en una carpeta con el nombre del repositorio, la `base` de
+Vite es `/racha/`.
+
+Cada push a `main` dispara `.github/workflows/publicar.yml`, que instala,
+**corre las pruebas** —si una falla no se publica nada— compila y sube el
+resultado a Pages.
+
+**El ícono no dice nada.** Un aro verde sobre fondo oscuro, sin letras ni
+símbolos: vive en la pantalla de inicio, entre las demás apps, y alguien puede
+verlo de reojo. Es la misma idea de la sección 8. Se dibuja con
+`scripts/iconos.mjs`, sin depender de ningún programa de diseño.
+
+**Sin conexión funciona completa.** El *service worker* guarda la app en el
+teléfono y los datos ya viven en `localStorage`: no hay nada que pedirle a la
+red después de la primera visita.
+
+**Recharts se carga aparte.** La app se abre a diario para tres toques en la
+pantalla Hoy, que no necesitan la librería de gráficas. Se descarga la primera
+vez que se abre una meta (`src/componentes/GraficaDiferida.tsx`). El arranque
+pasó de 666 KB a 337 KB.
+
 ---
 
 ## 3. Reglas del proyecto
@@ -511,7 +535,7 @@ Interacción diaria real: **tres toques**. Los cinco negativos no piden nada.
 | 05 | Modo discreto. **Hecha.** |
 | 06 | Hábitos, CRUD completo y Estadísticas. **Hecha.** |
 | 07 | Metas, mediciones y gráficas. **Hecha.** |
-| 08 | PWA, GitHub Pages e instalación en el iPhone. Incluye cargar Recharts solo al abrir una meta: la app se abre a diario para tres toques y no debe cargar la librería de gráficas para eso |
+| 08 | PWA, GitHub Pages, instalación en el iPhone y carga diferida de Recharts. **Hecha.** |
 | 09 | Respaldo y cierre de la v1 |
 | 10 | README y portafolio |
 

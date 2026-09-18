@@ -15,7 +15,7 @@ import { useState } from 'react'
 
 import CerrarMeta from '../componentes/CerrarMeta'
 import ConfirmarEliminarMeta from '../componentes/ConfirmarEliminarMeta'
-import GraficaMeta from '../componentes/GraficaMeta'
+import GraficaDiferida from '../componentes/GraficaDiferida'
 import HabitosDeLaMeta from '../componentes/HabitosDeLaMeta'
 import HojaMedicion from '../componentes/HojaMedicion'
 import ListaDeMediciones from '../componentes/ListaDeMediciones'
@@ -107,7 +107,7 @@ export default function DetalleMeta({ meta, datos, hoy, alCerrar, alEditar, alCa
         </p>
 
         <section className="mt-4 rounded-2xl border border-neutral-200 bg-white p-3 dark:border-neutral-800 dark:bg-neutral-900">
-          <GraficaMeta meta={meta} mediciones={mediciones} />
+          <GraficaDiferida meta={meta} mediciones={mediciones} />
           <p className="mt-1 px-1 text-[0.7rem] leading-relaxed text-neutral-400 dark:text-neutral-500">
             La línea punteada es el plan. Los puntos huecos son mediciones de noche.
           </p>
