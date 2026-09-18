@@ -5,13 +5,17 @@
  * que arranca (sección 5). En un día normal el usuario **no hace nada**: el
  * contador sube solo y a medianoche el día se cierra como cumplido.
  *
- * De ahí las dos decisiones de diseño de este componente, y la razón de que sea
+ * De ahí las tres decisiones de diseño de este componente, y la razón de que sea
  * un archivo distinto del de los positivos (regla 6):
  *
  * - **No hay palomita.** No hay nada que marcar.
- * - El botón de recaída es **deliberadamente discreto**: letra chica, gris, sin
- *   ícono, arriba a la derecha y lejos del contador. Está ahí para cuando se
- *   necesita, no para invitar a tocarse.
+ * - **La fila es compacta**, de la misma altura que la de un positivo. La regla
+ *   de la pantalla Hoy es que lo que pide acción va accesible y visible, y lo
+ *   que solo informa va compacto. Son cinco negativos: si cada uno ocupara el
+ *   doble, habría que bajar con el dedo para llegar a lo que sí hay que tocar.
+ * - El botón de recaída es **texto gris y nada más**, sin borde ni fondo: está
+ *   ahí para cuando se necesita, no para invitar a tocarse, y no debe competir
+ *   con la palomita de marcar.
  */
 
 import { useState } from 'react'
@@ -20,7 +24,7 @@ import { guardarRegistro } from '../datos/repositorio'
 import { idDeRegistro, recaidaDelDia } from '../logica/dia'
 import { mostrarIcono, mostrarNombre } from '../logica/nombres'
 import { rachaDe } from '../logica/rachas'
-import { pluralizar, textoDiasLimpios } from '../logica/textos'
+import { pluralizar, textoDeNegativo } from '../logica/textos'
 import HojaRecaida from './HojaRecaida'
 import type { DatosDeRacha } from '../logica/rachas'
 import type { Fecha, Habito, Hora } from '../tipos'
@@ -61,47 +65,32 @@ export default function FilaHabitoNegativo({ habito, datos, hoy, alCambiar }: Pr
   }
 
   return (
-    <li className="rounded-2xl border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
-            <span aria-hidden="true" className={habito.privado ? 'text-neutral-400' : ''}>
-              {mostrarIcono(habito)}
-            </span>
-            <span className="truncate">{mostrarNombre(habito)}</span>
-          </p>
+    <li className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-3 py-2.5 dark:border-neutral-800 dark:bg-neutral-900">
+      <span aria-hidden="true" className={`text-lg ${habito.privado ? 'text-neutral-400' : ''}`}>
+        {mostrarIcono(habito)}
+      </span>
 
-          <p className="mt-1 flex items-baseline gap-2">
-            <span className="text-3xl font-semibold tabular-nums text-neutral-900 dark:text-neutral-100">
-              {actual}
-            </span>
-            <span className="text-sm text-neutral-500 dark:text-neutral-400">{textoDiasLimpios(actual)}</span>
-          </p>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm text-neutral-700 dark:text-neutral-200">{mostrarNombre(habito)}</p>
+        <p className="truncate text-xs text-neutral-400 dark:text-neutral-500">
+          {textoDeNegativo(actual, mejor, recaidaDeHoy)}
+        </p>
+      </div>
 
-          {mejor > actual && (
-            <p className="mt-0.5 text-xs text-neutral-400 dark:text-neutral-500">
-              mejor: {pluralizar(mejor, 'día', 'días')}
-            </p>
-          )}
-        </div>
+      <div className="flex shrink-0 flex-col items-end">
+        <span className="text-sm font-medium tabular-nums text-neutral-600 dark:text-neutral-300">
+          {pluralizar(actual, 'día', 'días')}
+        </span>
 
-        {/* Discreto a propósito: no debe competir con el contador. */}
+        {/* Texto gris y nada más: no debe competir con la palomita de marcar. */}
         <button
           type="button"
           onClick={() => setHojaAbierta(true)}
-          className="shrink-0 rounded-full border border-neutral-200 px-3 py-2 text-xs text-neutral-400 dark:border-neutral-700 dark:text-neutral-500"
+          className="-mr-1 px-1 py-0.5 text-xs text-neutral-400 dark:text-neutral-500"
         >
           Recaída
         </button>
       </div>
-
-      {recaidaDeHoy !== undefined && (
-        <p className="mt-3 border-t border-neutral-100 pt-2 text-xs text-neutral-400 dark:border-neutral-800 dark:text-neutral-500">
-          Registrada hoy
-          {recaidaDeHoy.hora === null ? '' : ` a las ${recaidaDeHoy.hora}`}
-          {recaidaDeHoy.contexto === null ? '' : ` · ${recaidaDeHoy.contexto}`}
-        </p>
-      )}
 
       {hojaAbierta && (
         <HojaRecaida habito={habito} alCerrar={() => setHojaAbierta(false)} alGuardar={registrar} />

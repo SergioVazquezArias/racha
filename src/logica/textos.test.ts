@@ -7,8 +7,15 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { pluralizar, textoDeComodines, textoDeRacha, textoDeSemana, textoDiasLimpios } from './textos'
-import { habitoDiario, habitoSemanal } from './pruebas/fabricas'
+import {
+  pluralizar,
+  textoDeComodines,
+  textoDeNegativo,
+  textoDeRacha,
+  textoDeSemana,
+  textoDiasLimpios,
+} from './textos'
+import { habitoDiario, habitoSemanal, recaida } from './pruebas/fabricas'
 
 describe('los plurales', () => {
   it('usa el singular con uno', () => {
@@ -63,5 +70,43 @@ describe('los comodines del mes', () => {
 
   it('lo dice sin drama cuando ya no quedan', () => {
     expect(textoDeComodines(0)).toBe('sin comodines este mes')
+  })
+})
+
+describe('el renglón chico de un hábito negativo', () => {
+  it('si hubo recaída hoy, dice la hora y el contexto', () => {
+    const registro = { ...recaida('sin-pantallas', '2026-09-18', '21:40'), contexto: 'estrés' }
+
+    expect(textoDeNegativo(0, 16, registro)).toBe('hoy 21:40 · estrés')
+  })
+
+  it('una recaída sin contexto solo dice la hora', () => {
+    expect(textoDeNegativo(0, 16, recaida('sin-pantallas', '2026-09-18', '19:15'))).toBe('hoy 19:15')
+  })
+
+  it('en un día limpio enseña el récord, si hay uno mejor', () => {
+    expect(textoDeNegativo(13, 16, undefined)).toBe('mejor: 16 días')
+  })
+
+  it('cuando el contador de ahora es el récord, lo dice', () => {
+    expect(textoDeNegativo(20, 20, undefined)).toBe('tu mejor racha hasta ahora')
+  })
+
+  it('un hábito recién creado dice que hoy empieza a contar', () => {
+    expect(textoDeNegativo(0, 0, undefined)).toBe('empieza a contar hoy')
+  })
+
+  it('ninguna de las frases lleva lenguaje de juicio', () => {
+    const frases = [
+      textoDeNegativo(0, 16, recaida('sin-pantallas', '2026-09-18')),
+      textoDeNegativo(13, 16, undefined),
+      textoDeNegativo(20, 20, undefined),
+      textoDeNegativo(0, 0, undefined),
+    ]
+    const prohibidas = ['lástima', 'fallaste', 'perdiste', 'mal', 'recaíste', '😔', '😢']
+
+    for (const frase of frases) {
+      for (const palabra of prohibidas) expect(frase).not.toContain(palabra)
+    }
   })
 })

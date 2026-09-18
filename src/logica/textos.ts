@@ -9,7 +9,7 @@
  * ni caritas: se registra y se sigue (sección 10).
  */
 
-import type { Habito } from '../tipos'
+import type { Habito, Registro } from '../tipos'
 
 /** `"1 semana"`, `"3 semanas"`. */
 export function pluralizar(cantidad: number, singular: string, plural: string): string {
@@ -37,6 +37,30 @@ export function textoDeSemana(hechos: number, objetivo: number): string {
 /** La etiqueta del contador de un hábito negativo: `"día limpio"` / `"días limpios"`. */
 export function textoDiasLimpios(dias: number): string {
   return dias === 1 ? 'día limpio' : 'días limpios'
+}
+
+/**
+ * El renglón chico de la fila de un hábito negativo.
+ *
+ * La fila es compacta —dos renglones, como la de un positivo— así que aquí cabe
+ * **un solo dato**, el que más importe saber en ese momento:
+ *
+ * 1. Si hubo recaída hoy, cuándo y en qué contexto.
+ * 2. Si no, el récord, y solo cuando hay uno mejor que el de ahora.
+ * 3. Si el contador de ahora **es** el récord, se dice, que es lo que se quiere
+ *    oír.
+ * 4. Y si el hábito acaba de nacer, que hoy empieza a contar.
+ *
+ * Ninguna de las cuatro frases juzga (sección 10).
+ */
+export function textoDeNegativo(actual: number, mejor: number, recaidaDeHoy: Registro | undefined): string {
+  if (recaidaDeHoy !== undefined) {
+    const cuando = recaidaDeHoy.hora === null ? 'hoy' : `hoy ${recaidaDeHoy.hora}`
+    return recaidaDeHoy.contexto === null ? cuando : `${cuando} · ${recaidaDeHoy.contexto}`
+  }
+  if (mejor > actual) return `mejor: ${pluralizar(mejor, 'día', 'días')}`
+  if (actual > 0) return 'tu mejor racha hasta ahora'
+  return 'empieza a contar hoy'
 }
 
 /** Los comodines que quedan del mes: `"1 comodín disponible"`, `"sin comodines este mes"`. */
