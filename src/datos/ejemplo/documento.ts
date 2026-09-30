@@ -1,13 +1,12 @@
 /**
  * Armado del documento completo.
  *
- * Aquí se juntan las piezas: los ajustes de fábrica, el documento en blanco, el
- * documento con datos de ejemplo que se siembra la primera vez que se abre la
- * app en un teléfono nuevo, y el documento en limpio que deja el botón de
- * borrar todo.
+ * Aquí se juntan las piezas: los ajustes de fábrica, el documento en blanco
+ * —que es lo que deja el botón de borrar todo— y el documento con datos de
+ * ejemplo que se siembra la primera vez que se abre la app en un teléfono
+ * nuevo.
  */
 
-import { hoy } from '../../logica/fechas'
 import { habitosDeEjemplo } from './habitos'
 import { historialDeEjemplo } from './historial'
 import { medicionesIniciales, metasIniciales } from './metas'
@@ -22,7 +21,18 @@ export const AJUSTES_INICIALES: Ajustes = {
   version: 1,
 }
 
-/** Documento en blanco: sin hábitos, sin historial, con los ajustes de fábrica. */
+/**
+ * Documento en blanco: sin hábitos, sin metas, sin historial, con los ajustes
+ * de fábrica.
+ *
+ * Es lo que deja el botón de «borrar todo» (sección 14). Borrar borra de
+ * verdad: no vuelve a sembrar los hábitos de ejemplo. Antes sí lo hacía, para
+ * no dejar al usuario frente a una pantalla en blanco, y el resultado fue que
+ * el botón parecía no hacer nada —los ocho nombres reaparecían idénticos— y la
+ * única manera de quitarlos era eliminarlos uno por uno.
+ *
+ * Las cuatro pantallas ya saben qué decir cuando no hay nada.
+ */
 export function documentoVacio(): DocumentoRacha {
   return {
     habitos: [],
@@ -53,40 +63,6 @@ export function documentoDeEjemplo(): DocumentoRacha {
     comodines: [],
     metas,
     mediciones: medicionesIniciales(metas),
-    ajustes: AJUSTES_INICIALES,
-  }
-}
-
-/**
- * Documento de un arranque en limpio: el que deja el botón de «borrar todo»
- * (sección 14).
- *
- * Los mismos ocho hábitos y las mismas dos metas, para no tener que escribirlos
- * desde la nada, pero **sin una sola línea de historial**: ni días registrados,
- * ni semanas cerradas, ni comodines, ni mediciones. Las rachas empiezan en cero
- * de verdad.
- *
- * Lo que hace falta explicar es el `creadoEn`. Los hábitos de ejemplo nacen
- * setenta y siete días atrás, porque ahí arranca el historial de ejemplo. Si se
- * vaciaran las listas y se les dejara esa fecha, la app, al abrirse, cerraría
- * once semanas pasadas **y las once saldrían rojas**: un hábito sin un solo día
- * marcado no cumple ningún objetivo. Serían justo las semanas inventadas que se
- * quería evitar. Por eso todos nacen hoy.
- *
- * Y naciendo hoy, la semana en curso no se juzga —un hábito que nace a media
- * semana no recibe veredicto de esa semana (sección 9)—, así que la primera
- * semana calificada es la que empieza el lunes que viene.
- */
-export function documentoEnLimpio(): DocumentoRacha {
-  const habitos = habitosDeEjemplo().map((habito) => ({ ...habito, creadoEn: hoy() }))
-
-  return {
-    habitos,
-    registros: [],
-    semanas: [],
-    comodines: [],
-    metas: metasIniciales(habitos),
-    mediciones: [],
     ajustes: AJUSTES_INICIALES,
   }
 }

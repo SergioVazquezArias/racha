@@ -214,7 +214,7 @@ Cuatro reglas del proyecto valen más que la lista de dependencias:
 - **Todo acceso a datos pasa por `src/datos/repositorio/`.** Ningún componente
   toca `localStorage`.
 - **Ningún archivo pasa de 200 líneas.** Si crece, se parte.
-- **Toda lógica nueva lleva pruebas, con los nombres en español.** Son 389, y
+- **Toda lógica nueva lleva pruebas, con los nombres en español.** Son 421, y
   están escritas para poderse leer como especificación: *«es ámbar cuando se
   queda corto pero llega al mínimo: 4 de 5»*.
 
@@ -248,7 +248,7 @@ datos inventados: se editan o se borran desde la propia app.
 Otros comandos:
 
 ```bash
-npm test         # las 389 pruebas
+npm test         # las 421 pruebas
 npm run test:mirar   # las pruebas en modo vigilancia
 npm run lint
 npm run build    # compila a dist/

@@ -4,7 +4,9 @@
 
 import { colocar, leerDocumento, modificar } from './documento'
 import { sinElHabito } from '../../logica/altas'
-import type { Comodin, Habito, Registro, Semana } from '../../tipos'
+import { semanasPorCerrar } from '../../logica/cierre'
+import { registrosRetroactivos } from '../../logica/retroactivo'
+import type { Comodin, Fecha, Habito, Registro, Semana } from '../../tipos'
 
 export function obtenerHabitos(): Habito[] {
   return leerDocumento().habitos.sort((uno, otro) => uno.orden - otro.orden)
@@ -17,6 +19,28 @@ export function obtenerHabitosActivos(): Habito[] {
 
 export function guardarHabito(habito: Habito): void {
   modificar((documento) => colocar(documento.habitos, habito))
+}
+
+/**
+ * Guardar un hábito recién creado o editado, con todo lo que arrastra.
+ *
+ * Es lo que usa el formulario, y hace tres cosas en este orden:
+ *
+ * 1. Guarda el hábito.
+ * 2. Escribe los días de antes, si dijo que ya lo llevaba desde una fecha
+ *    anterior a hoy. Quién decide cuáles es `retroactivo.ts`.
+ * 3. Cierra las semanas que esos días completaron. Normalmente los veredictos
+ *    se emiten al arrancar la app (`main.tsx`), pero un hábito que acaba de
+ *    nacer con fecha vieja tendría el historial a medias hasta el siguiente
+ *    arranque, y eso se ve como un error.
+ *
+ * Cada paso vuelve a leer el documento a propósito: el siguiente necesita lo
+ * que escribió el anterior.
+ */
+export function guardarHabitoConHistorial(habito: Habito, hoy: Fecha): void {
+  guardarHabito(habito)
+  guardarRegistros(registrosRetroactivos(habito, obtenerRegistros(), hoy))
+  guardarSemanas(semanasPorCerrar(obtenerHabitos(), obtenerRegistros(), obtenerSemanas(), hoy))
 }
 
 /**
@@ -48,6 +72,19 @@ export function obtenerRegistrosDe(habitoId: string): Registro[] {
 
 export function guardarRegistro(registro: Registro): void {
   modificar((documento) => colocar(documento.registros, registro))
+}
+
+/**
+ * Varios registros de golpe, en una sola escritura.
+ *
+ * Lo usan los días de antes de un hábito que ya se llevaba: pueden ser
+ * trescientos, y trescientas escrituras seguidas a `localStorage` se notan.
+ */
+export function guardarRegistros(registros: Registro[]): void {
+  if (registros.length === 0) return
+  modificar((documento) => {
+    for (const registro of registros) colocar(documento.registros, registro)
+  })
 }
 
 /** Desmarcar un día: se quita el registro, no se guarda como fallado. */

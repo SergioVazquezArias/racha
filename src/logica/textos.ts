@@ -9,7 +9,9 @@
  * ni caritas: se registra y se sigue (sección 10).
  */
 
-import type { Habito, Registro } from '../tipos'
+import { diasEntre } from './fechas'
+import type { CamposDeHabito } from './altas'
+import type { Fecha, Habito, Registro } from '../tipos'
 
 /** `"1 semana"`, `"3 semanas"`. */
 export function pluralizar(cantidad: number, singular: string, plural: string): string {
@@ -75,4 +77,30 @@ export function textoDeNegativo(actual: number, mejor: number, recaidaDeHoy: Reg
 export function textoDeComodines(disponibles: number): string {
   if (disponibles === 0) return 'sin comodines este mes'
   return `${pluralizar(disponibles, 'comodín disponible', 'comodines disponibles')}`
+}
+
+/**
+ * Lo que va a pasar con los días anteriores a hoy, escrito debajo del campo de
+ * la fecha en el formulario de un hábito.
+ *
+ * Existe porque poner «lo llevo desde hace diez días» hace que la app escriba
+ * diez días de historial, y eso no se puede adivinar mirando un selector de
+ * fechas. Dice exactamente qué va a quedar escrito, antes de guardar.
+ *
+ * Quien de verdad los escribe es `retroactivo.ts`; esto solo lo cuenta.
+ */
+export function textoDeDiasPrevios(campos: CamposDeHabito, hoy: Fecha): string {
+  const dias = diasEntre(campos.creadoEn, hoy)
+  if (campos.creadoEn === '' || dias <= 0) return 'Hoy. La racha empieza a contar desde mañana.'
+
+  const previos = pluralizar(dias, 'día', 'días')
+
+  if (campos.tipo === 'negativo') return `Vas a arrancar con ${dias} ${textoDiasLimpios(dias)}.`
+
+  if (campos.cadencia === 'semanal') {
+    const veces = pluralizar(campos.objetivo ?? 0, 'vez', 'veces')
+    return `Se van a dar por cumplidas tus ${veces} en cada semana de esos ${previos}.`
+  }
+
+  return `Se van a dar por hechos esos ${previos}, menos hoy, que lo marcas tú.`
 }

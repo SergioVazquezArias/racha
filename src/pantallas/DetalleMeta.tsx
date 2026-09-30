@@ -73,7 +73,9 @@ export default function DetalleMeta({ meta, datos, hoy, alCerrar, alEditar, alCa
   }
 
   return (
-    <div className="fixed inset-0 z-40 overflow-y-auto bg-stone-100 dark:bg-stone-950">
+    // Por encima de la barra de pestañas, como el detalle de un hábito: abajo
+    // del todo están los botones de cerrar y eliminar la meta.
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-100 dark:bg-stone-950">
       <div className="mx-auto max-w-md px-4 pb-16">
         <header className="borde-superior-seguro flex items-center justify-between pb-2">
           <button

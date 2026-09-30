@@ -9,16 +9,29 @@
  * No regaña de más: un hábito sin contextos o sin emoji se guarda sin problema.
  */
 
+import { diasEntre } from './fechas'
 import type { CamposDeHabito } from './altas'
+import type { Fecha } from '../tipos'
+
+/**
+ * Lo más atrás que se puede poner la fecha de inicio de un hábito.
+ *
+ * No es una regla de negocio, es un cerrojo contra el dedo gordo: en el
+ * selector de fechas del iPhone es facilísimo irse dos años sin querer, y un
+ * hábito diario que nace en 2019 se pone a rellenar dos mil días de golpe.
+ */
+export const DIAS_MAXIMOS_HACIA_ATRAS = 365
 
 /**
  * Los problemas de un hábito, en orden de aparición en el formulario. Lista
  * vacía quiere decir que se puede guardar.
  */
-export function problemasDe(campos: CamposDeHabito): string[] {
+export function problemasDe(campos: CamposDeHabito, hoy: Fecha): string[] {
   const problemas: string[] = []
 
   if (campos.nombre.trim() === '') problemas.push('Ponle un nombre.')
+
+  problemas.push(...problemasDeLaFecha(campos.creadoEn, hoy))
 
   // Un hábito privado sin alias se vería como «Hábito privado» en la pantalla
   // Hoy, y entre los demás eso canta más que un nombre cualquiera (sección 8).
@@ -29,6 +42,24 @@ export function problemasDe(campos: CamposDeHabito): string[] {
   if (campos.cadencia === 'semanal') problemas.push(...problemasDelSemaforo(campos))
 
   return problemas
+}
+
+/**
+ * La fecha desde la que se lleva el hábito.
+ *
+ * Mañana no existe: un hábito que empieza en el futuro no tiene un solo día que
+ * contar y deja todas las cuentas en negativo. Y hacia atrás hay un tope, que
+ * está explicado arriba.
+ */
+function problemasDeLaFecha(creadoEn: Fecha, hoy: Fecha): string[] {
+  if (creadoEn === '') return ['Ponle la fecha desde la que lo llevas.']
+  if (creadoEn > hoy) return ['La fecha desde la que lo llevas no puede ser en el futuro.']
+
+  if (diasEntre(creadoEn, hoy) > DIAS_MAXIMOS_HACIA_ATRAS) {
+    return ['La fecha desde la que lo llevas no puede ser de hace más de un año.']
+  }
+
+  return []
 }
 
 /**

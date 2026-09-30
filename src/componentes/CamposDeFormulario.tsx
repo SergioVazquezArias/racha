@@ -1,6 +1,6 @@
 /**
  * Las piezas sueltas de los formularios: un interruptor, un campo de texto, un
- * número y un selector de dos o tres opciones.
+ * número, una fecha y un selector de dos o tres opciones.
  *
  * Viven aparte porque las usan Ajustes y el formulario de hábitos, y porque
  * todas tienen que cumplir la misma regla: **del tamaño de un pulgar**. En un
@@ -40,6 +40,46 @@ export function Interruptor({
         />
       </span>
     </button>
+  )
+}
+
+/**
+ * Un campo de fecha con su etiqueta encima y una ayuda debajo.
+ *
+ * Usa el selector de fechas del teléfono —`type="date"`— en vez de tres cajitas
+ * de día, mes y año: en el iPhone es una rueda que se gira con el pulgar, sin
+ * teclado. El `max` le quita los días futuros de encima al usuario en lugar de
+ * regañarlo después de guardar.
+ */
+export function CampoFecha({
+  etiqueta,
+  ayuda,
+  valor,
+  max,
+  alCambiar,
+}: {
+  etiqueta: string
+  ayuda?: string
+  valor: string
+  max?: string
+  alCambiar: (valor: string) => void
+}) {
+  return (
+    <label className="block">
+      <span className="text-xs text-neutral-500 dark:text-neutral-400">{etiqueta}</span>
+      <input
+        type="date"
+        value={valor}
+        max={max}
+        onChange={(evento) => alCambiar(evento.target.value)}
+        className="mt-1 min-h-12 w-full rounded-2xl border border-neutral-200 bg-white px-3 text-base text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+      />
+      {ayuda !== undefined && (
+        <span className="mt-1 block px-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
+          {ayuda}
+        </span>
+      )}
+    </label>
   )
 }
 

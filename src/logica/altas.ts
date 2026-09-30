@@ -6,10 +6,13 @@
  * el reloj. Así se pueden probar una por una (regla 10) y el repositorio se
  * queda con su único trabajo, que es guardar.
  *
- * 1. **Un hábito nuevo cuenta desde su `creadoEn`.** Nace con la fecha de hoy y
- *    nunca mira hacia atrás.
- * 2. **Editar no reescribe el pasado.** `conCambios` no toca `creadoEn` ni las
- *    semanas ya cerradas: cambiar hoy el objetivo deja intacto el mes pasado.
+ * 1. **Un hábito cuenta desde su `creadoEn`.** Normalmente es hoy, pero se
+ *    puede poner un día del pasado: hay hábitos que ya se llevaban antes de
+ *    apuntarlos en la app. Nunca puede ser mañana.
+ * 2. **Editar no reescribe los veredictos.** `conCambios` no toca las semanas
+ *    ya cerradas: cambiar hoy el objetivo deja intacto el mes pasado. La fecha
+ *    de inicio sí se puede corregir, porque es un dato que se captura mal con
+ *    facilidad y no hay otra forma de arreglarlo.
  * 3. **Archivar conserva todo** —registros, semanas y mejor racha— y se puede
  *    revivir.
  * 4. **Eliminar borra todo el rastro**, y antes hay que escribir el nombre.
@@ -30,6 +33,12 @@ export interface CamposDeHabito {
   minimo: number | null
   permiteComodin: boolean
   contextos: string[]
+  /**
+   * Desde cuándo se lleva el hábito. Por omisión hoy, y puede ser un día del
+   * pasado: «esto ya lo hacía desde hace dos semanas, apenas lo estoy
+   * apuntando». Quién marca esos días de antes es `retroactivo.ts`.
+   */
+  creadoEn: Fecha
 }
 
 /** Las cuatro listas donde un hábito deja rastro. */
@@ -48,8 +57,9 @@ export function nuevoId(): string {
 /**
  * Un hábito nuevo (regla 1 de la sección 9).
  *
- * Nace con `creadoEn` en el día de hoy, y eso es lo que hace que nunca invente
- * fallas de días anteriores: todas las cuentas de la app arrancan ahí.
+ * Nace con el `creadoEn` que dijo el formulario —hoy, o el día del pasado desde
+ * el que ya se llevaba—, y ahí arrancan todas las cuentas de la app: antes de
+ * esa fecha no se mira nunca, así que jamás inventa fallas.
  *
  * Va al final de la lista, después del último que haya.
  */
@@ -63,9 +73,8 @@ export function nuevoHabito(
 
   return {
     id,
-    ...coherentes(campos),
+    ...coherentes(campos, hoy),
     orden: ultimoOrden + 1,
-    creadoEn: hoy,
     archivadoEn: null,
     revividoEn: null,
     mejorRachaPrevia: null,
@@ -75,19 +84,25 @@ export function nuevoHabito(
 /**
  * Un hábito editado (regla 2 de la sección 9).
  *
- * Solo cambia lo que el formulario captura. **`creadoEn`, el tipo y la cadencia
- * se quedan como estaban**, y las semanas ya cerradas ni se mencionan: guardan
- * su propio objetivo y su propio mínimo, congelados el día que se cerraron
- * (regla 8). Subirse el objetivo de 5 a 6 hoy no vuelve ámbar la semana pasada.
+ * Solo cambia lo que el formulario captura. **El tipo y la cadencia se quedan
+ * como estaban**, y las semanas ya cerradas ni se mencionan: guardan su propio
+ * objetivo y su propio mínimo, congelados el día que se cerraron (regla 8).
+ * Subirse el objetivo de 5 a 6 hoy no vuelve ámbar la semana pasada.
  *
  * El tipo y la cadencia no se editan porque cambiarlos dejaría un historial que
  * no significa nada: los días cumplidos de un positivo no son las recaídas de
  * un negativo. Para eso se archiva y se crea otro.
+ *
+ * La fecha de inicio **sí** se puede mover, y nunca destruye historial: hacia
+ * atrás amplía lo que cuenta —los días nuevos los rellena `retroactivo.ts`— y
+ * hacia adelante lo encoge, dejando los registros de fuera guardados y sin
+ * mirar. En un hábito que se archivó y volvió el conteo arranca en `revividoEn`
+ * y no aquí (sección 9), así que mover esta fecha no cambia su racha.
  */
-export function conCambios(habito: Habito, campos: CamposDeHabito): Habito {
+export function conCambios(habito: Habito, campos: CamposDeHabito, hoy: Fecha): Habito {
   return {
     ...habito,
-    ...coherentes({ ...campos, tipo: habito.tipo, cadencia: habito.cadencia }),
+    ...coherentes({ ...campos, tipo: habito.tipo, cadencia: habito.cadencia }, hoy),
   }
 }
 
@@ -154,12 +169,16 @@ export function sinElHabito(rastro: RastroDeHabitos, habitoId: string): RastroDe
  * imposibles: un negativo con comodines, o un hábito diario con objetivo de
  * cinco veces por semana.
  */
-function coherentes(campos: CamposDeHabito): CamposDeHabito {
+function coherentes(campos: CamposDeHabito, hoy: Fecha): CamposDeHabito {
   const semanal = campos.cadencia === 'semanal'
 
   return {
     ...campos,
     nombre: campos.nombre.trim(),
+    // Una fecha de mañana dejaría al hábito sin días que contar y con cuentas
+    // en negativo. `validacion.ts` ya no la deja pasar; esto es el segundo
+    // cerrojo, por si algún día entra por otro lado.
+    creadoEn: campos.creadoEn > hoy ? hoy : campos.creadoEn,
     alias: campos.privado ? (campos.alias?.trim() || null) : null,
     // Un negativo nunca admite comodín: una recaída es una recaída (sección 7).
     permiteComodin: campos.tipo === 'negativo' ? false : campos.permiteComodin,

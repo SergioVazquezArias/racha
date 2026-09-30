@@ -6,7 +6,7 @@
  * `localStorage`; el resto del repositorio pasa por aquí (regla 5).
  */
 
-import { documentoDeEjemplo, documentoEnLimpio, documentoVacio } from '../ejemplo/documento'
+import { documentoDeEjemplo, documentoVacio } from '../ejemplo/documento'
 import type { DocumentoRacha } from '../../tipos'
 
 /** La llave de `localStorage`. El `v1` permite migrar mañana sin pisar lo viejo. */
@@ -85,17 +85,18 @@ export function importarDocumento(documento: DocumentoRacha): void {
 /**
  * Borrar todo y empezar de cero (sección 14).
  *
- * Deja los ocho hábitos y las dos metas puestos, para no tener que escribirlos
- * desde la nada, y **nada más**: ni un día registrado, ni una semana cerrada,
- * ni una medición. No es lo mismo que una instalación nueva, que sí trae
- * historial de ejemplo para que ninguna pantalla se vea vacía el primer día;
- * aquí las rachas empiezan en cero de verdad.
+ * No queda nada: ni un hábito, ni una meta, ni un día registrado, ni una semana
+ * cerrada, ni una medición. La app queda como si nunca se hubiera usado, salvo
+ * por un detalle que importa: **el documento vacío sí se guarda**. Si en vez de
+ * eso se borrara la llave, `inicializar` creería que el teléfono está estrenando
+ * la app y volvería a sembrar los ocho hábitos de ejemplo en el siguiente
+ * arranque, que es justo lo que este botón existe para no hacer.
  *
- * Los detalles de por qué eso no es solo vaciar listas están en
- * `documentoEnLimpio`, junto a las pruebas que lo vigilan.
+ * Una instalación nueva es otra cosa y sí trae los ocho hábitos con historial,
+ * para que ninguna pantalla se vea vacía el primer día.
  */
 export function empezarDeCero(): DocumentoRacha {
-  const documento = documentoEnLimpio()
+  const documento = documentoVacio()
   guardarDocumento(documento)
   return documento
 }

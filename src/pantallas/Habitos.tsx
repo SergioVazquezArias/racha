@@ -15,7 +15,7 @@ import { useState } from 'react'
 
 import FormularioHabito from '../componentes/FormularioHabito'
 import DetalleHabito from './DetalleHabito'
-import { guardarHabito } from '../datos/repositorio'
+import { guardarHabitoConHistorial } from '../datos/repositorio'
 import { hoy as hoyMismo } from '../logica/fechas'
 import { mostrarIcono, mostrarNombre } from '../logica/nombres'
 import { rachaDe } from '../logica/rachas'
@@ -39,7 +39,9 @@ export default function Habitos() {
   const enEdicion = todos.find((habito) => habito.id === editando) ?? null
 
   function guardar(habito: Habito) {
-    guardarHabito(habito)
+    // Guarda el hábito y, si viene con fecha de antes, los días y las semanas
+    // que esa fecha da por vividos. El detalle está en el repositorio.
+    guardarHabitoConHistorial(habito, hoy)
     setFormularioAbierto(false)
     setEditando(null)
     recargar()

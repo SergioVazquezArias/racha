@@ -388,10 +388,33 @@ Pedir un nombre escondido obligaría a destaparlo para poder escribirlo.
 
 ### Cuatro reglas que no se pueden improvisar
 
-1. **Un hábito nuevo cuenta desde su `creadoEn`.** Nunca mira hacia atrás ni
-   inventa fallas en días en que no existía.
+1. **Un hábito cuenta desde su `creadoEn`.** Nunca mira más atrás ni inventa
+   fallas en días en que no existía.
+
+   El formulario pregunta esa fecha —«Lo llevo desde»— y por omisión es hoy,
+   pero se puede poner un día anterior: casi ningún hábito empieza el día en que
+   se apunta en la app. Al guardarlo, `src/logica/retroactivo.ts` escribe los
+   días que esa fecha da por vividos, y el formulario dice debajo del campo
+   exactamente qué va a escribir, porque eso no se adivina mirando un selector
+   de fechas. Hoy nunca se marca: lo marca el usuario, como cualquier otro día.
+
+   - **Negativo** — no escribe nada. Un negativo está limpio mientras no haya
+     recaída registrada (sección 5), así que con mover la fecha ya cuenta.
+   - **Positivo diario** — marca todos los días hasta ayer.
+   - **Positivo semanal** — marca **las veces del objetivo** en cada semana, no
+     las siete: un hábito de cinco por semana con los siete días palomeados
+     diría «7 de 5», un número que nadie se cree. Con cinco, cada semana pasada
+     cierra en verde, que es lo que significa «lo llevo desde entonces».
+
+   Nunca pisa un día que ya tenga registro, sea palomita o recaída.
 2. **Cambiar `objetivo` o `minimo` no reescribe semanas ya cerradas.** Para eso
    existe la entidad `Semana`.
+
+   La fecha de inicio **sí** se puede corregir al editar, porque es un dato que
+   se captura mal con facilidad y no habría otra forma de arreglarlo. Moverla
+   hacia atrás amplía lo que cuenta y rellena los días nuevos; moverla hacia
+   adelante lo encoge, pero no borra un solo registro: los días que quedan fuera
+   siguen guardados y dejan de mirarse. Editar nunca destruye historial.
 3. **Archivar un hábito no rompe la meta que lo usaba.** La meta lo suelta de
    sus barras de proceso pero conserva las semanas históricas ya dibujadas.
 4. **Las metas se cierran como `cumplida` o `abandonada`** con fecha, y quedan
@@ -575,21 +598,22 @@ aviso que se apaga sin que haya respaldo no sirve de nada.
 
 ### Borrar todo
 
-Botón al final de Ajustes, apartado del resto. Pide escribir `BORRAR` y deja
-puestos los ocho hábitos y las dos metas —para no tener que escribirlos desde la
-nada— y **nada más**: ni un día registrado, ni una semana cerrada, ni un
-comodín, ni una medición. Las rachas empiezan en cero de verdad.
+Botón al final de Ajustes, apartado del resto. Pide escribir `BORRAR` y deja la
+app **completamente vacía**: ni un hábito, ni una meta, ni un día registrado, ni
+una semana cerrada, ni un comodín, ni una medición.
 
-No es lo mismo que una instalación nueva, que sí trae historial de ejemplo para
-que ninguna pantalla se vea vacía el primer día.
+No es lo mismo que una instalación nueva, que sí trae los ocho hábitos con
+historial de ejemplo para que ninguna pantalla se vea vacía el primer día. Esa
+diferencia importa, y se pagó por aprenderla: durante la v1, borrar volvía a
+sembrar esos ocho hábitos —sin historial, con las rachas en cero— para no dejar
+al usuario frente a una pantalla en blanco. El resultado fue que el botón
+**parecía no hacer nada**, porque los ocho nombres reaparecían idénticos, y la
+única forma de quitarlos era eliminarlos uno por uno. Un botón destructivo que
+se ve como si hubiera fallado es peor que uno que no existe.
 
-**Y no basta con vaciar las listas.** Los hábitos de ejemplo nacen setenta y
-siete días atrás, que es donde arranca ese historial. Si se les dejara esa
-fecha, la app al abrirse cerraría once semanas pasadas **y las once saldrían
-rojas**, porque un hábito sin un solo día marcado no cumple ningún objetivo:
-serían justo las semanas inventadas que el botón existe para no dejar. Por eso
-todos nacen hoy, y la semana a medias en que se borró no se juzga (sección 9):
-la primera semana calificada es la del lunes siguiente. Lo vigila
+El documento vacío **sí se guarda** en `localStorage`, y eso no es un detalle: si
+se borrara la llave, `inicializar` creería que el teléfono está estrenando la app
+y volvería a sembrar los ocho hábitos en el siguiente arranque. Lo vigila
 `src/datos/ejemplo/documento.test.ts`.
 
 ---

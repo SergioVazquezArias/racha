@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest'
 import {
   pluralizar,
   textoDeComodines,
+  textoDeDiasPrevios,
   textoDeNegativo,
   textoDeRacha,
   textoDeSemana,
@@ -17,6 +18,7 @@ import {
   unidadDeRacha,
 } from './textos'
 import { habitoDiario, habitoSemanal, recaida } from './pruebas/fabricas'
+import type { CamposDeHabito } from './altas'
 
 describe('los plurales', () => {
   it('usa el singular con uno', () => {
@@ -121,5 +123,57 @@ describe('la unidad de una racha', () => {
     expect(unidadDeRacha(diario, 1)).toBe('día')
     expect(unidadDeRacha(semanal, 3)).toBe('semanas')
     expect(unidadDeRacha(semanal, 1)).toBe('semana')
+  })
+})
+
+describe('el aviso de los días de antes, en el formulario', () => {
+  /** Jueves 17 de septiembre de 2026. */
+  const HOY = '2026-09-17'
+
+  function campos(cambios: Partial<CamposDeHabito> = {}): CamposDeHabito {
+    return {
+      nombre: 'Ir al gym',
+      icono: '🏋️',
+      privado: false,
+      alias: null,
+      tipo: 'positivo',
+      cadencia: 'diaria',
+      objetivo: null,
+      minimo: null,
+      permiteComodin: true,
+      contextos: [],
+      creadoEn: HOY,
+      ...cambios,
+    }
+  }
+
+  it('con la fecha de hoy avisa que la racha empieza mañana', () => {
+    expect(textoDeDiasPrevios(campos(), HOY)).toBe('Hoy. La racha empieza a contar desde mañana.')
+  })
+
+  it('en un hábito de todos los días dice cuántos se van a dar por hechos', () => {
+    expect(textoDeDiasPrevios(campos({ creadoEn: '2026-09-07' }), HOY)).toBe(
+      'Se van a dar por hechos esos 10 días, menos hoy, que lo marcas tú.',
+    )
+  })
+
+  it('en un hábito de veces por semana habla de veces, no de días', () => {
+    const semanal = campos({ creadoEn: '2026-09-07', cadencia: 'semanal', objetivo: 5, minimo: 4 })
+
+    expect(textoDeDiasPrevios(semanal, HOY)).toBe(
+      'Se van a dar por cumplidas tus 5 veces en cada semana de esos 10 días.',
+    )
+  })
+
+  it('en un hábito negativo habla de días limpios y no de días hechos', () => {
+    const negativo = campos({ creadoEn: '2026-09-10', tipo: 'negativo' })
+
+    expect(textoDeDiasPrevios(negativo, HOY)).toBe('Vas a arrancar con 7 días limpios.')
+  })
+
+  it('y con un solo día lo dice en singular', () => {
+    const negativo = campos({ creadoEn: '2026-09-16', tipo: 'negativo' })
+
+    expect(textoDeDiasPrevios(negativo, HOY)).toBe('Vas a arrancar con 1 día limpio.')
   })
 })

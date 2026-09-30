@@ -93,6 +93,14 @@ Aplican a todo el código. Son la sección 3 de `docs/arquitectura.md`.
 **La v1 está cerrada y etiquetada como `v1.0`.** De aquí en adelante no hay plan
 de fases: lo que venga son cambios sueltos.
 
+Lo que se ha hecho después de la v1:
+
+| Cambio | Contenido |
+|---|---|
+| 01 | El detalle tapaba su botón de eliminar con la barra de pestañas |
+| 02 | Borrar todo deja la app vacía en vez de resembrar los ocho de ejemplo |
+| 03 | «Lo llevo desde»: un hábito puede empezar antes del día en que se apunta |
+
 ---
 
 ## Notas para retomar el proyecto
@@ -104,7 +112,7 @@ sesión nueva— sin acordarse de nada.
 
 1. Lee este archivo y luego `docs/arquitectura.md`, que es la especificación
    completa. Todo lo que parece arbitrario está explicado ahí.
-2. `npm install` y `npm test`. Si las 389 pruebas pasan, el proyecto está sano.
+2. `npm install` y `npm test`. Si las 421 pruebas pasan, el proyecto está sano.
 3. `npm run dev` abre la app en <http://localhost:5173/racha/>. El `/racha/` del
    final hace falta.
 4. Cada push a `main` corre las pruebas y publica en GitHub Pages. Si una prueba
@@ -140,10 +148,19 @@ es evidente desde el código:
   dentro de la PWA instalada en iOS. Quitar los otros dos caminos porque «uno
   basta» reintroduce un fallo invisible en lo único que protege los datos. La
   hoja de compartir está **probada en el iPhone de Sergio**, no solo investigada.
-- **Al borrar todo, los hábitos nacen con `creadoEn` de hoy.** Si conservaran su
-  fecha original, la app cerraría once semanas pasadas en rojo al abrirse. Lo
-  vigila `src/datos/ejemplo/documento.test.ts`; si esa prueba estorba, el
-  problema es el cambio, no la prueba.
+- **Borrar todo deja la app vacía, y el documento vacío se guarda.** Durante la
+  v1 borrar volvía a sembrar los ocho hábitos de ejemplo, y el botón parecía no
+  hacer nada: los mismos ocho nombres reaparecían. Y si en vez de guardar un
+  documento vacío se borrara la llave de `localStorage`, el siguiente arranque
+  los sembraría otra vez. Lo vigila `src/datos/ejemplo/documento.test.ts`.
+- **La fecha «Lo llevo desde» escribe historial.** Ponerla en el pasado hace que
+  `src/logica/retroactivo.ts` dé por cumplidos esos días —el objetivo de la
+  semana en los semanales, no los siete días— y nunca pisa un día ya registrado.
+  Por eso el formulario dice debajo del campo qué va a escribir antes de
+  guardar: un campo de fecha que escribe veinte días de racha sin avisar es una
+  trampa.
+- **Las pantallas de detalle van por encima de la barra de pestañas** (`z-50`).
+  Con `z-40` la barra les tapa el último botón, que es justo el de eliminar.
 - **Recharts se carga aparte**, no en el arranque. La pantalla Hoy —que es el
   99 % del uso— no necesita la librería de gráficas.
 - **La `base` de Vite es `/racha/`.** Sin eso la app publicada abre en blanco.

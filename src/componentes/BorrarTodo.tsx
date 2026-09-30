@@ -4,6 +4,10 @@
  * Va al final de Ajustes y apartado del resto, porque es lo único de esta
  * pantalla que destruye datos. Pide escribir «BORRAR», y antes ofrece la salida
  * buena: hacer un respaldo, que está justo arriba.
+ *
+ * Deja la app vacía del todo. Los ocho hábitos de ejemplo solo aparecen la
+ * primera vez que la app se abre en un teléfono o un navegador nuevo; de ahí en
+ * adelante, borrar es borrar.
  */
 
 import { useState } from 'react'
@@ -51,9 +55,8 @@ export default function BorrarTodo() {
             teléfono no queda copia.
           </p>
           <p>
-            Quedan puestos los ocho hábitos y las dos metas, para que no tengas que escribirlos desde la
-            nada, y <strong className="font-medium">nada más</strong>: las rachas empiezan en cero de verdad,
-            contando desde hoy.
+            La app queda <strong className="font-medium">completamente vacía</strong>: ni un hábito, ni una
+            meta. Tendrás que crear los tuyos desde cero.
           </p>
         </ConfirmarConPalabra>
       )}

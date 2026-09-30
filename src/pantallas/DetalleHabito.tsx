@@ -65,7 +65,10 @@ export default function DetalleHabito({ habito, datos, hoy, alCerrar, alEditar, 
   }
 
   return (
-    <div className="fixed inset-0 z-40 overflow-y-auto bg-stone-100 dark:bg-stone-950">
+    // La capa va por encima de la barra de pestañas —igual que Ajustes—, no por
+    // debajo: si la barra quedara encima, se comería el botón de eliminar, que
+    // es justo el último de la pantalla.
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-100 dark:bg-stone-950">
       <div className="mx-auto max-w-md px-4 pb-16">
         <header className="borde-superior-seguro flex items-center justify-between pb-4">
           <button type="button" onClick={alCerrar} className="-ml-2 px-2 py-1 text-base text-neutral-500 dark:text-neutral-400">

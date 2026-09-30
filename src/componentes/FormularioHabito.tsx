@@ -13,6 +13,9 @@
  * - **Aquí sí se escribe y se lee el nombre real**, aunque el hábito sea
  *   privado. Es el único lugar donde tiene que ser así: es donde se escribe.
  *   El alias de al lado es lo que verá el resto de la app (sección 8).
+ * - **La fecha de inicio dice debajo qué va a pasar con los días de antes.**
+ *   Ponerla en el pasado hace que la app escriba historial, y eso no se puede
+ *   adivinar mirando un selector de fechas.
  *
  * Quién decide qué se puede guardar es `validacion.ts`, y quién arma el hábito
  * es `altas.ts`. Este archivo solo dibuja y pregunta.
@@ -22,8 +25,9 @@ import { useState } from 'react'
 
 import { conCambios, nuevoHabito } from '../logica/altas'
 import { mostrarNombre } from '../logica/nombres'
+import { textoDeDiasPrevios } from '../logica/textos'
 import { problemasDe } from '../logica/validacion'
-import { CampoNumero, CampoTexto, Interruptor, Segmentado } from './CamposDeFormulario'
+import { CampoFecha, CampoNumero, CampoTexto, Interruptor, Segmentado } from './CamposDeFormulario'
 import EditorContextos from './EditorContextos'
 import type { CamposDeHabito } from '../logica/altas'
 import type { Fecha, Habito } from '../tipos'
@@ -37,10 +41,11 @@ interface Props {
   alGuardar: (habito: Habito) => void
 }
 
-/** Un hábito nuevo empieza como positivo semanal de 5 y 4, que es lo común. */
-function camposIniciales(habito: Habito | null): CamposDeHabito {
+/** Un hábito nuevo empieza como positivo semanal de 5 y 4, desde hoy, que es lo común. */
+function camposIniciales(habito: Habito | null, hoy: Fecha): CamposDeHabito {
   if (habito === null) {
     return {
+      creadoEn: hoy,
       nombre: '',
       icono: '✅',
       privado: false,
@@ -54,12 +59,13 @@ function camposIniciales(habito: Habito | null): CamposDeHabito {
     }
   }
 
-  const { nombre, icono, privado, alias, tipo, cadencia, objetivo, minimo, permiteComodin, contextos } = habito
-  return { nombre, icono, privado, alias, tipo, cadencia, objetivo, minimo, permiteComodin, contextos }
+  const { nombre, icono, privado, alias, tipo, cadencia, objetivo, minimo, permiteComodin } = habito
+  const { contextos, creadoEn } = habito
+  return { nombre, icono, privado, alias, tipo, cadencia, objetivo, minimo, permiteComodin, contextos, creadoEn }
 }
 
 export default function FormularioHabito({ habito, existentes, hoy, alCerrar, alGuardar }: Props) {
-  const [campos, setCampos] = useState<CamposDeHabito>(() => camposIniciales(habito))
+  const [campos, setCampos] = useState<CamposDeHabito>(() => camposIniciales(habito, hoy))
   const [problemas, setProblemas] = useState<string[]>([])
 
   function cambiar(cambios: Partial<CamposDeHabito>) {
@@ -67,11 +73,11 @@ export default function FormularioHabito({ habito, existentes, hoy, alCerrar, al
   }
 
   function guardar() {
-    const encontrados = problemasDe(campos)
+    const encontrados = problemasDe(campos, hoy)
     setProblemas(encontrados)
     if (encontrados.length > 0) return
 
-    alGuardar(habito === null ? nuevoHabito(campos, existentes, hoy) : conCambios(habito, campos))
+    alGuardar(habito === null ? nuevoHabito(campos, existentes, hoy) : conCambios(habito, campos, hoy))
   }
 
   return (
@@ -146,6 +152,14 @@ export default function FormularioHabito({ habito, existentes, hoy, alCerrar, al
           {campos.tipo === 'negativo' && (
             <EditorContextos contextos={campos.contextos} alCambiar={(contextos) => cambiar({ contextos })} />
           )}
+
+          <CampoFecha
+            etiqueta="Lo llevo desde"
+            valor={campos.creadoEn}
+            max={hoy}
+            ayuda={textoDeDiasPrevios(campos, hoy)}
+            alCambiar={(creadoEn) => cambiar({ creadoEn })}
+          />
 
           <div>
             <Interruptor titulo="Privado" prendido={campos.privado} alTocar={() => cambiar({ privado: !campos.privado })} />
